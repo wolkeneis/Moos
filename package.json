@@ -1,0 +1,16 @@
+{
+  "name": "moos",
+  "version": "0.1.0",
+  "description": "Moos Backend",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wolkeneis/Moos.git"
+  },
+  "author": "Frooastside",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/wolkeneis/Moos/issues"
+  },
+  "homepage": "https://moos.wolkeneis.dev/"
+}
