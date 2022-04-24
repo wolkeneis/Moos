@@ -1,9 +1,12 @@
-import database from "database";
-import { Client, User } from "database/database-adapter";
+import database from "./database";
+import { Client, User } from "./database/database-adapter";
 import passport from "passport";
 import { BasicStrategy } from "passport-http";
 import { Strategy as BearerStrategy } from "passport-http-bearer";
 import { Strategy as ClientPasswordStrategy } from "passport-oauth2-client-password";
+
+export const passportMiddleware = passport.initialize();
+export const passportSessionMiddleware = passport.session();
 
 passport.serializeUser((expressUser, done) => {
   done(null, (expressUser as User).id);

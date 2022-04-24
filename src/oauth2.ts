@@ -1,6 +1,6 @@
 import crypto from "crypto";
-import database from "database";
-import { AuthorizationCode, DatabaseError, User, UserClientToken } from "database/database-adapter";
+import database from "./database";
+import { AuthorizationCode, DatabaseError, User, UserClientToken } from "./database/database-adapter";
 import oauth2orize, { DeserializeClientDoneFunction } from "oauth2orize";
 
 const server = oauth2orize.createServer();

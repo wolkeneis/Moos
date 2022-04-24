@@ -32,7 +32,7 @@ import DatabaseAdapter, {
   UpdateClientRedirectUriOptions
 } from "./database-adapter";
 
-class RealtimeDatabaseImpl implements DatabaseAdapter {
+export default class RealtimeDatabaseImpl implements DatabaseAdapter {
   database: Database;
 
   constructor(database: Database) {
@@ -107,5 +107,3 @@ class RealtimeDatabaseImpl implements DatabaseAdapter {
     throw new Error("Method not implemented.");
   }
 }
-
-export default RealtimeDatabaseImpl;

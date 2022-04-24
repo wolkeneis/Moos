@@ -1,9 +1,10 @@
 import { ensureLoggedIn } from "connect-ensure-login";
-import { Client, DatabaseError, User, UserClientToken } from "database/database-adapter";
+import { Client, DatabaseError, User, UserClientToken } from "../database/database-adapter";
 import express, { Router } from "express";
 import passport from "passport";
 import database from "../database";
 import server from "../oauth2";
+import { envRequire } from "../environment";
 
 const router: Router = express.Router();
 
@@ -33,7 +34,7 @@ router.get(
   (req, res) => {
     if (!req.oauth2) return res.sendStatus(500);
     res.redirect(
-      process.env.CONTROL_ORIGIN +
+      envRequire("CONTROL_ORIGIN") +
         `/redirect/authorize?transactionId=${encodeURIComponent(req.oauth2.transactionID)}&username=${encodeURIComponent(
           req.oauth2.user.username
         )}&client=${encodeURIComponent(req.oauth2.client.name)}`
