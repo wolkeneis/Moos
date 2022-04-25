@@ -1,13 +1,14 @@
 import admin, { ServiceAccount } from "firebase-admin";
 import serviceAccount from "./security/service-account.json";
 
-admin.initializeApp({
+const app = admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as ServiceAccount),
   databaseURL: "https://wolkeneis-default-rtdb.europe-west1.firebasedatabase.app"
 });
 
-const database = admin.database();
-const firestore = admin.firestore();
+const auth = app.auth();
+const database = app.database();
+const firestore = app.firestore();
 
-export default admin;
-export { database, firestore };
+export default app;
+export { auth, database, firestore };

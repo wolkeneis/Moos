@@ -2,7 +2,7 @@ import cors from "cors";
 import express from "express";
 import "./environment";
 import { env } from "./environment";
-import { oauth2 } from "./routes";
+import { oauth2, login } from "./routes";
 import { sessionMiddleware } from "./session";
 import { passportMiddleware, passportSessionMiddleware } from "./strategies";
 
@@ -32,6 +32,7 @@ app.use(passportMiddleware);
 app.use(passportSessionMiddleware);
 
 app.use("/oauth2", oauth2);
+app.use("/login", login);
 
 app.get("/", (req, res) => {
   res.sendStatus(200);

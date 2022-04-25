@@ -29,7 +29,9 @@ import DatabaseAdapter, {
   UpdateClientNameDoneFunction,
   UpdateClientNameOptions,
   UpdateClientRedirectUriDoneFunction,
-  UpdateClientRedirectUriOptions
+  UpdateClientRedirectUriOptions,
+  UpdateOrCreateUserDoneFunction,
+  UpdateOrCreateUserOptions
 } from "./database-adapter";
 
 export default class RealtimeDatabaseImpl implements DatabaseAdapter {
@@ -64,6 +66,10 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
   }
 
   userFindById(options: FindUserByIdOptions, done: FindUserByIdDoneFunction): void {
+    throw new Error("Method not implemented.");
+  }
+
+  userUpdateOrCreate(options: UpdateOrCreateUserOptions, done: UpdateOrCreateUserDoneFunction): void {
     throw new Error("Method not implemented.");
   }
 

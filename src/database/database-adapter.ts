@@ -7,6 +7,7 @@ export default interface DatabaseAdapter {
   clientCheckSecret(options: CheckClientSecretOptions, done: CheckClientSecretDoneFunction): void;
 
   userFindById(options: FindUserByIdOptions, done: FindUserByIdDoneFunction): void;
+  userUpdateOrCreate(options: UpdateOrCreateUserOptions, done: UpdateOrCreateUserDoneFunction): void;
 
   authorizationCodesFind(options: FindAuthorizationCodeOptions, done: FindAuthorizationCodeDoneFunction): void;
   authorizationCodesSave(options: SaveAuthorizationCodeOptions, done: SaveAuthorizationCodeDoneFunction): void;
@@ -36,24 +37,38 @@ export type Client = {
 };
 
 export type User = {
-  id: string;
+  uid: string;
   username: string;
   avatar: string;
-  provider: AuthProvider;
+  scopes: Array<string>;
+  providers: ProviderReferences;
   private?: boolean;
+};
+
+export type ProviderReferences = {
+  discord?: string;
+};
+
+export type ProviderProfile = {
+  uid: string;
+  providerId: string;
+  username: string;
+  avatar?: string;
+  accessToken: string;
+  refreshToken?: string;
 };
 
 export type AuthorizationCode = {
   code: string;
   clientId: string;
   redirectUri: string;
-  userId: string;
+  uid: string;
 };
 
 export type UserClientToken = {
   token: string;
   clientId: string;
-  userId: string;
+  uid: string;
 };
 
 export type FindClientByIdOptions = {
@@ -61,7 +76,7 @@ export type FindClientByIdOptions = {
 };
 
 export type CreateClientOptions = {
-  userId: string;
+  uid: string;
   name: string;
   redirectUri: string;
 };
@@ -86,7 +101,16 @@ export type CheckClientSecretOptions = {
 };
 
 export type FindUserByIdOptions = {
-  userId: string;
+  uid: string;
+};
+
+export type UpdateOrCreateUserOptions = {
+  provider: AuthProvider;
+  providerId: string;
+  username: string;
+  avatar?: string;
+  accessToken: string;
+  refreshToken?: string;
 };
 
 export type FindAuthorizationCodeOptions = {
@@ -103,7 +127,7 @@ export type FindAccessTokenOptions = {
 
 export type FindAccessTokenByIdOptions = {
   clientId: string;
-  userId: string;
+  uid: string;
 };
 
 export type SaveAccessTokenOptions = {
@@ -120,7 +144,7 @@ export type FindRefreshTokenOptions = {
 
 export type FindRefreshTokenByIdOptions = {
   clientId: string;
-  userId: string;
+  uid: string;
 };
 
 export type SaveRefreshTokenOptions = {
@@ -160,3 +184,5 @@ export type RegenerateClientSecretDoneFunction = (error: DatabaseError, secret?:
 export type CheckClientSecretDoneFunction = (error: DatabaseError, successful?: boolean) => void;
 
 export type FindUserByIdDoneFunction = (error: DatabaseError, user?: User) => void;
+
+export type UpdateOrCreateUserDoneFunction = (error: DatabaseError, user?: User) => void;

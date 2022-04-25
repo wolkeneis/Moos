@@ -24,7 +24,7 @@ router.get(
     },
     (client: Client, user: User, scope, type, areq, done) => {
       if (client.trusted) return done(null, true, null, null);
-      database.accessTokenFindByIds({ clientId: client.id, userId: user.id }, (error: DatabaseError, token?: UserClientToken) => {
+      database.accessTokenFindByIds({ clientId: client.id, uid: user.uid }, (error: DatabaseError, token?: UserClientToken) => {
         if (error) return done(error, false, null, null);
         if (token) return done(null, true, null, null);
         return done(null, false, null, null);

@@ -1,8 +1,9 @@
-import { FirestoreStore } from "./database";
 import session from "express-session";
-import { firestore } from "./firebase";
+import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
+import { FirestoreStore } from "./database";
 import "./environment";
 import { env, envRequire } from "./environment";
+import { auth, firestore } from "./firebase";
 
 export const sessionMiddleware = session({
   store: new FirestoreStore({
@@ -20,3 +21,17 @@ export const sessionMiddleware = session({
     maxAge: 604800000
   }
 });
+
+export function verifyCookie(cookie: string): Promise<DecodedIdToken | null> {
+  return auth.verifySessionCookie(cookie, true).catch(() => null);
+}
+
+export function createCookie(token: string): Promise<string> {
+  return auth.createSessionCookie(token, {
+    expiresIn: 604800000
+  });
+}
+
+export function verifyToken(token: string): Promise<DecodedIdToken | null> {
+  return auth.verifyIdToken(token).catch(() => null);
+}
