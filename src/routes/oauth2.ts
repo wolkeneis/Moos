@@ -5,12 +5,14 @@ import passport from "passport";
 import database from "../database";
 import server from "../oauth2";
 import { envRequire } from "../environment";
+import { csrfMiddleware } from "../session";
 
 const router: Router = express.Router();
 
 router.get(
   "/authorize",
   ensureLoggedIn("/login"),
+  csrfMiddleware,
   server.authorization(
     (clientId, redirectUri, done) => {
       database.clientFindById({ clientId: clientId }, (error: DatabaseError, client?: Client) => {
@@ -37,12 +39,12 @@ router.get(
       envRequire("CONTROL_ORIGIN") +
         `/redirect/authorize?transactionId=${encodeURIComponent(req.oauth2.transactionID)}&username=${encodeURIComponent(
           req.oauth2.user.username
-        )}&client=${encodeURIComponent(req.oauth2.client.name)}`
+        )}&client=${encodeURIComponent(req.oauth2.client.name)}&_csrf=${encodeURIComponent(req.csrfToken())}`
     );
   }
 );
 
-router.post("/authorize", ensureLoggedIn("/login"), server.decision());
+router.post("/authorize", ensureLoggedIn("/login"), csrfMiddleware, server.decision());
 
 router.post("/token", passport.authenticate(["basic", "oauth2-client-password"], { session: false }), server.token(), server.errorHandler());
 

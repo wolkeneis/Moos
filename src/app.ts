@@ -5,6 +5,7 @@ import { env } from "./environment";
 import { oauth2, login } from "./routes";
 import { sessionMiddleware } from "./session";
 import { passportMiddleware, passportSessionMiddleware } from "./strategies";
+import csurf from "csurf";
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use(
     credentials: true
   })
 );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(sessionMiddleware);

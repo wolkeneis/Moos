@@ -1,9 +1,12 @@
 import express from "express";
 import passport from "passport";
+import { csrfMiddleware } from "../session";
 
 import "../strategies";
 
 const router = express.Router();
+
+router.use(csrfMiddleware);
 
 router.get("/", (req, res) => {
   res.redirect(process.env.CONTROL_ORIGIN + "/redirect/profile");

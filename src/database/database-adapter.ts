@@ -7,7 +7,8 @@ export default interface DatabaseAdapter {
   clientCheckSecret(options: CheckClientSecretOptions, done: CheckClientSecretDoneFunction): void;
 
   userFindById(options: FindUserByIdOptions, done: FindUserByIdDoneFunction): void;
-  userUpdateOrCreate(options: UpdateOrCreateUserOptions, done: UpdateOrCreateUserDoneFunction): void;
+  userProviderProfileUpdateOrCreate(options: UpdateOrCreateProviderProfileOptions, done: UpdateOrCreateProviderProfileDoneFunction): void;
+  userProviderProfileFindById(options: FindProviderProfileByIdOptions, done: FindProviderProfileByIdDoneFunction): void;
 
   authorizationCodesFind(options: FindAuthorizationCodeOptions, done: FindAuthorizationCodeDoneFunction): void;
   authorizationCodesSave(options: SaveAuthorizationCodeOptions, done: SaveAuthorizationCodeDoneFunction): void;
@@ -104,13 +105,18 @@ export type FindUserByIdOptions = {
   uid: string;
 };
 
-export type UpdateOrCreateUserOptions = {
+export type UpdateOrCreateProviderProfileOptions = {
   provider: AuthProvider;
+  uid: string;
   providerId: string;
   username: string;
   avatar?: string;
   accessToken: string;
   refreshToken?: string;
+};
+
+export type FindProviderProfileByIdOptions = {
+  providerId: string;
 };
 
 export type FindAuthorizationCodeOptions = {
@@ -185,4 +191,6 @@ export type CheckClientSecretDoneFunction = (error: DatabaseError, successful?: 
 
 export type FindUserByIdDoneFunction = (error: DatabaseError, user?: User) => void;
 
-export type UpdateOrCreateUserDoneFunction = (error: DatabaseError, user?: User) => void;
+export type UpdateOrCreateProviderProfileDoneFunction = (error: DatabaseError, user?: User) => void;
+
+export type FindProviderProfileByIdDoneFunction = (error: DatabaseError, profile: ProviderProfile) => void;
