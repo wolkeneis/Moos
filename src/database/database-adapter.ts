@@ -7,6 +7,7 @@ export default interface DatabaseAdapter {
   clientCheckSecret(options: CheckClientSecretOptions, done: CheckClientSecretDoneFunction): void;
 
   userFindById(options: FindUserByIdOptions, done: FindUserByIdDoneFunction): void;
+  userCreate(options: CreateUserOptions, done: CreateUserDoneFunction): void;
   userProviderProfileUpdateOrCreate(options: UpdateOrCreateProviderProfileOptions, done: UpdateOrCreateProviderProfileDoneFunction): void;
   userProviderProfileFindById(options: FindProviderProfileByIdOptions, done: FindProviderProfileByIdDoneFunction): void;
 
@@ -40,9 +41,9 @@ export type Client = {
 export type User = {
   uid: string;
   username: string;
-  avatar: string;
+  avatar?: string;
   scopes: Array<string>;
-  providers: ProviderReferences;
+  providers?: ProviderReferences;
   private?: boolean;
 };
 
@@ -103,6 +104,14 @@ export type CheckClientSecretOptions = {
 
 export type FindUserByIdOptions = {
   uid: string;
+};
+
+export type CreateUserOptions = {
+  uid: string;
+  username: string;
+  avatar?: string;
+  scopes: Array<string>;
+  private?: boolean;
 };
 
 export type UpdateOrCreateProviderProfileOptions = {
@@ -190,6 +199,8 @@ export type RegenerateClientSecretDoneFunction = (error: DatabaseError, secret?:
 export type CheckClientSecretDoneFunction = (error: DatabaseError, successful?: boolean) => void;
 
 export type FindUserByIdDoneFunction = (error: DatabaseError, user?: User) => void;
+
+export type CreateUserDoneFunction = (error: DatabaseError) => void;
 
 export type UpdateOrCreateProviderProfileDoneFunction = (error: DatabaseError, user?: User) => void;
 

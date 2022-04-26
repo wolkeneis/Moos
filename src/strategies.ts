@@ -7,7 +7,7 @@ import database from "./database";
 import { Client, DatabaseError, User } from "./database/database-adapter";
 import { envRequire } from "./environment";
 import { Request } from "express";
-import { verifyCookie } from "session";
+import { verifyCookie } from "auth";
 
 export const passportMiddleware = passport.initialize();
 export const passportSessionMiddleware = passport.session();
@@ -62,14 +62,15 @@ passport.use(
       scope: scopes,
       passReqToCallback: true
     },
-    (req: Request, accessToken: string, refreshToken: string, profile: Profile, done) => {
+    async (req: Request, accessToken: string, refreshToken: string, profile: Profile, done) => {
       console.log(req, accessToken, refreshToken, profile);
       if (req.cookies.session) {
         verifyCookie(req.cookies.session).then((token) => {
           if (token) {
-            database.userUpdateOrCreate(
+            database.userProviderProfileUpdateOrCreate(
               {
-                provider: profile.provider,
+                provider: "discord",
+                uid: token.uid,
                 providerId: profile.id,
                 username: profile.username + "#" + profile.discriminator,
                 avatar: profile.avatar ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png` : undefined,
@@ -84,6 +85,12 @@ passport.use(
           }
         });
       } else {
+        database.userProviderProfileFindById({providerId: profile.id}, (error, profile?) => {
+          if(error) {
+            done(error);
+          }
+
+        });
       }
     }
   )

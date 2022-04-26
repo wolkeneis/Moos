@@ -5,12 +5,16 @@ import DatabaseAdapter, {
   CheckClientSecretOptions,
   CreateClientDoneFunction,
   CreateClientOptions,
+  CreateUserDoneFunction,
+  CreateUserOptions,
   DatabaseError,
   FindAccessTokenByIdOptions,
   FindAccessTokenDoneFunction,
   FindAccessTokenOptions,
   FindClientByIdDoneFunction,
   FindClientByIdOptions,
+  FindProviderProfileByIdDoneFunction,
+  FindProviderProfileByIdOptions,
   FindRefreshTokenByIdOptions,
   FindRefreshTokenDoneFunction,
   FindRefreshTokenOptions,
@@ -30,8 +34,8 @@ import DatabaseAdapter, {
   UpdateClientNameOptions,
   UpdateClientRedirectUriDoneFunction,
   UpdateClientRedirectUriOptions,
-  UpdateOrCreateUserDoneFunction,
-  UpdateOrCreateUserOptions
+  UpdateOrCreateProviderProfileDoneFunction,
+  UpdateOrCreateProviderProfileOptions
 } from "./database-adapter";
 
 export default class RealtimeDatabaseImpl implements DatabaseAdapter {
@@ -69,7 +73,15 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     throw new Error("Method not implemented.");
   }
 
-  userUpdateOrCreate(options: UpdateOrCreateUserOptions, done: UpdateOrCreateUserDoneFunction): void {
+  userCreate(options: CreateUserOptions, done: CreateUserDoneFunction): void {
+    throw new Error("Method not implemented.");
+  }
+
+  userProviderProfileUpdateOrCreate(options: UpdateOrCreateProviderProfileOptions, done: UpdateOrCreateProviderProfileDoneFunction): void {
+    throw new Error("Method not implemented.");
+  }
+
+  userProviderProfileFindById(options: FindProviderProfileByIdOptions, done: FindProviderProfileByIdDoneFunction): void {
     throw new Error("Method not implemented.");
   }
 
