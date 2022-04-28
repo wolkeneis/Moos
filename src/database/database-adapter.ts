@@ -1,31 +1,33 @@
 export default interface DatabaseAdapter {
-  clientFindById(options: FindClientByIdOptions, done: FindClientByIdDoneFunction): void;
-  clientCreate(options: CreateClientOptions, done: CreateClientDoneFunction): void;
-  clientUpdateName(options: UpdateClientNameOptions, done: UpdateClientNameDoneFunction): void;
-  clientUpdateRedirectUri(options: UpdateClientRedirectUriOptions, done: UpdateClientRedirectUriDoneFunction): void;
-  clientRegenerateSecret(options: RegenerateClientSecretOptions, done: RegenerateClientSecretDoneFunction): void;
-  clientCheckSecret(options: CheckClientSecretOptions, done: CheckClientSecretDoneFunction): void;
+  clientFindById(options: FindClientByIdOptions): Promise<Client>;
+  clientCreate(options: CreateClientOptions): Promise<ClientSecret>;
+  clientUpdateName(options: UpdateClientNameOptions): Promise<void>;
+  clientUpdateRedirectUri(options: UpdateClientRedirectUriOptions): Promise<void>;
+  clientRegenerateSecret(options: RegenerateClientSecretOptions): Promise<ClientSecret>;
+  clientCheckSecret(options: CheckClientSecretOptions): Promise<CheckResult>;
 
-  userFindById(options: FindUserByIdOptions, done: FindUserByIdDoneFunction): void;
-  userCreate(options: CreateUserOptions, done: CreateUserDoneFunction): void;
-  userProviderProfileUpdateOrCreate(options: UpdateOrCreateProviderProfileOptions, done: UpdateOrCreateProviderProfileDoneFunction): void;
-  userProviderProfileFindById(options: FindProviderProfileByIdOptions, done: FindProviderProfileByIdDoneFunction): void;
+  userFindById(options: FindUserByIdOptions): Promise<User>;
+  userCreate(options: CreateUserOptions): Promise<void>;
+  userProviderProfileUpdateOrCreate(options: UpdateOrCreateProviderProfileOptions): Promise<ProviderProfile>;
+  userProviderProfileFindById(options: FindProviderProfileByIdOptions): Promise<ProviderProfile>;
 
-  authorizationCodesFind(options: FindAuthorizationCodeOptions, done: FindAuthorizationCodeDoneFunction): void;
-  authorizationCodesSave(options: SaveAuthorizationCodeOptions, done: SaveAuthorizationCodeDoneFunction): void;
+  authorizationCodesFind(options: FindAuthorizationCodeOptions): Promise<AuthorizationCode>;
+  authorizationCodesSave(options: SaveAuthorizationCodeOptions): Promise<void>;
 
-  accessTokenFind(options: FindAccessTokenOptions, done: FindAccessTokenDoneFunction): void;
-  accessTokenFindByIds(options: FindAccessTokenByIdOptions, done: FindAccessTokenDoneFunction): void;
-  accessTokenSave(options: SaveAccessTokenOptions, done: SaveAccessTokenDoneFunction): void;
-  accessTokenRemoveByIds(options: RemoveAccessTokenByIdsOptions, done: RemoveAccessTokenByIdsDoneFunction): void;
+  accessTokenFind(options: FindAccessTokenOptions): Promise<UserClientToken>;
+  accessTokenFindByIds(options: FindAccessTokenByIdOptions): Promise<UserClientToken>;
+  accessTokenSave(options: SaveAccessTokenOptions): Promise<void>;
+  accessTokenRemoveByIds(options: RemoveAccessTokenByIdsOptions): Promise<void>;
 
-  refreshTokenFind(options: FindRefreshTokenOptions, done: FindRefreshTokenDoneFunction): void;
-  refreshTokenFindByIds(options: FindRefreshTokenByIdOptions, done: FindRefreshTokenDoneFunction): void;
-  refreshTokenSave(options: SaveRefreshTokenOptions, done: SaveRefreshTokenDoneFunction): void;
-  refreshTokenRemoveByIds(options: RemoveRefreshTokenByIdsOptions, done: RemoveRefreshTokenByIdsDoneFunction): void;
+  refreshTokenFind(options: FindRefreshTokenOptions): Promise<UserClientToken>;
+  refreshTokenFindByIds(options: FindRefreshTokenByIdOptions): Promise<UserClientToken>;
+  refreshTokenSave(options: SaveRefreshTokenOptions): Promise<void>;
+  refreshTokenRemoveByIds(options: RemoveRefreshTokenByIdsOptions): Promise<void>;
 }
 
-export type DatabaseError = Error | null;
+export type ClientSecret = string;
+
+export type CheckResult = boolean;
 
 export type AuthProvider = "github" | "discord" | "google" | "twitter" | "email" | "spotify";
 
@@ -78,9 +80,10 @@ export type FindClientByIdOptions = {
 };
 
 export type CreateClientOptions = {
-  uid: string;
+  id: string;
   name: string;
   redirectUri: string;
+  ownerUid: string;
 };
 
 export type UpdateClientNameOptions = {
@@ -125,6 +128,7 @@ export type UpdateOrCreateProviderProfileOptions = {
 };
 
 export type FindProviderProfileByIdOptions = {
+  provider: string;
   providerId: string;
 };
 
@@ -169,39 +173,3 @@ export type SaveRefreshTokenOptions = {
 export type RemoveRefreshTokenByIdsOptions = {
   refreshToken: UserClientToken;
 };
-
-export type FindAuthorizationCodeDoneFunction = (error: DatabaseError, authorizationCode?: AuthorizationCode) => void;
-
-export type SaveAuthorizationCodeDoneFunction = (error: DatabaseError) => void;
-
-export type FindAccessTokenDoneFunction = (error: DatabaseError, accessToken?: UserClientToken | undefined) => void;
-
-export type SaveAccessTokenDoneFunction = (error: DatabaseError) => void;
-
-export type RemoveAccessTokenByIdsDoneFunction = (error: DatabaseError) => void;
-
-export type FindRefreshTokenDoneFunction = (error: DatabaseError, refreshToken?: UserClientToken | undefined) => void;
-
-export type SaveRefreshTokenDoneFunction = (error: DatabaseError) => void;
-
-export type RemoveRefreshTokenByIdsDoneFunction = (error: DatabaseError) => void;
-
-export type FindClientByIdDoneFunction = (error: DatabaseError, client?: Client) => void;
-
-export type CreateClientDoneFunction = (error: DatabaseError, secret?: string) => void;
-
-export type UpdateClientNameDoneFunction = (error: DatabaseError) => void;
-
-export type UpdateClientRedirectUriDoneFunction = (error: DatabaseError) => void;
-
-export type RegenerateClientSecretDoneFunction = (error: DatabaseError, secret?: string) => void;
-
-export type CheckClientSecretDoneFunction = (error: DatabaseError, successful?: boolean) => void;
-
-export type FindUserByIdDoneFunction = (error: DatabaseError, user?: User) => void;
-
-export type CreateUserDoneFunction = (error: DatabaseError) => void;
-
-export type UpdateOrCreateProviderProfileDoneFunction = (error: DatabaseError, user?: User) => void;
-
-export type FindProviderProfileByIdDoneFunction = (error: DatabaseError, profile: ProviderProfile) => void;

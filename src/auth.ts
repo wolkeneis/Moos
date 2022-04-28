@@ -2,32 +2,29 @@ import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
 import { auth } from "./firebase";
 import database from "./database";
 
-export async function createUser(username: string, avatar?: string): Promise<string | null> {
-  return new Promise<string | null>(async (resolve, reject) => {
-  try {
-    const user = await auth.createUser({
-      disabled: false,
-      displayName: username,
-      emailVerified: false,
-      photoURL: avatar
-    });
-    database.userCreate(
-      {
-        avatar: avatar,
-        scopes: [],
-        uid: user.uid,
-        username: username
-      },
-      (error) => {
-        if (error) {
-          return reject();
-        }
-        return resolve(user.uid);
-      }
-    );
-  } catch (error) {
-    return reject(error);
-  }
+export async function createUser(username: string, avatar?: string): Promise<string> {
+  return new Promise<string>(async (resolve, reject) => {
+    try {
+      const user = await auth.createUser({
+        disabled: false,
+        displayName: username,
+        emailVerified: false,
+        photoURL: avatar
+      });
+      database
+        .userCreate({
+          avatar: avatar,
+          scopes: [],
+          uid: user.uid,
+          username: username
+        })
+        .then(() => {
+          return resolve(user.uid);
+        })
+        .catch(reject);
+    } catch (error) {
+      return reject(error);
+    }
   });
 }
 
