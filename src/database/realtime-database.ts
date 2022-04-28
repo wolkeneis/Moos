@@ -28,7 +28,7 @@ import DatabaseAdapter, {
 } from "./database-adapter";
 import argon2 from "argon2";
 import crypto from "crypto";
-import {Reference} from "firebase-admin/database";
+import { Reference } from "firebase-admin/database";
 
 function _randomToken(length: number): string {
   return crypto.randomBytes(length).toString("hex");
@@ -39,12 +39,18 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
   clients: Reference;
   profiles: Reference;
   providers: Reference;
+  authorizationCodes: Reference;
+  accessTokens: Reference;
+  refreshTokens: Reference;
 
   constructor(database: Database) {
     this.database = database;
     this.clients = database.ref("clients");
     this.profiles = database.ref("profiles");
     this.providers = database.ref("providers");
+    this.authorizationCodes = database.ref("authorizationCodes");
+    this.accessTokens = database.ref("accessTokens");
+    this.refreshTokens = database.ref("refreshTokens");
   }
   async clientFindById(options: FindClientByIdOptions): Promise<Client> {
     return (await this.clients.child(options.clientId).get()).val();
@@ -93,7 +99,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     return (await this.profiles.child(options.uid).get()).val();
   }
   async userCreate(options: CreateUserOptions): Promise<void> {
-    const user: User =  {
+    const user: User = {
       uid: options.uid,
       scopes: options.scopes,
       username: options.username,
@@ -109,22 +115,22 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
       username: options.username,
       avatar: options.avatar,
       accessToken: options.accessToken,
-      refreshToken: options.refreshToken,
-    }
+      refreshToken: options.refreshToken
+    };
     await this.providers.child(options.provider).child(options.providerId).set(providerProfile);
     return providerProfile;
   }
   async userProviderProfileFindById(options: FindProviderProfileByIdOptions): Promise<ProviderProfile> {
-    return (await this.providers.child(options.provider).child(options.providerId).get()).val()
+    return (await this.providers.child(options.provider).child(options.providerId).get()).val();
   }
-  authorizationCodesFind(options: FindAuthorizationCodeOptions): Promise<AuthorizationCode> {
-    return (await).val();
+  async authorizationCodesFind(options: FindAuthorizationCodeOptions): Promise<AuthorizationCode> {
+    return (await this.authorizationCodes.child(options.authorizationCode).get()).val();
   }
-  authorizationCodesSave(options: SaveAuthorizationCodeOptions): Promise<void> {
-    throw new Error("Method not implemented.");
+  async authorizationCodesSave(options: SaveAuthorizationCodeOptions): Promise<void> {
+    await this.authorizationCodes.child(options.authorizationCode.code).set(options.authorizationCode);
   }
-  accessTokenFind(options: FindAccessTokenOptions): Promise<UserClientToken> {
-    throw new Error("Method not implemented.");
+  async accessTokenFind(options: FindAccessTokenOptions): Promise<UserClientToken> {
+    return (await this.accessTokens.child(options.accessToken).get()).val();
   }
   accessTokenFindByIds(options: FindAccessTokenByIdOptions): Promise<UserClientToken> {
     throw new Error("Method not implemented.");
