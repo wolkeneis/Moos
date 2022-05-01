@@ -1,3 +1,60 @@
+export type ClientSecret = string;
+
+export type CheckResult = boolean;
+
+export type AuthProvider = "discord";
+
+export type Client = {
+  id: string;
+  name: string;
+  redirectUri: string;
+  secret: string;
+  trusted: boolean;
+  owner: string;
+};
+
+export type User = {
+  uid: string;
+  username: string;
+  avatar: string | null;
+  scopes: Array<string>;
+  providers?: ProviderReferences;
+  private: boolean;
+};
+
+export type ProviderReferences = {
+  discord?: string;
+};
+
+export type ProviderProfile = {
+  providerId: string;
+  uid: string;
+  username: string;
+  avatar: string | null;
+  accessToken: string;
+  refreshToken: string | null;
+};
+
+export type AuthorizationCode = {
+  code: string;
+  clientId: string;
+  redirectUri: string;
+  uid: string;
+  creationDate: number;
+};
+
+export type UserClientToken = {
+  token: string;
+  uid: string;
+  clientId: string;
+  creationDate: number;
+};
+
+export type TokenReference = {
+  token: string;
+  clientId: string;
+};
+
 export default interface DatabaseAdapter {
   clientFindById(options: FindClientByIdOptions): Promise<Client>;
   clientCreate(options: CreateClientOptions): Promise<ClientSecret>;
@@ -12,6 +69,7 @@ export default interface DatabaseAdapter {
   userProviderProfileFindById(options: FindProviderProfileByIdOptions): Promise<ProviderProfile>;
 
   authorizationCodesFind(options: FindAuthorizationCodeOptions): Promise<AuthorizationCode>;
+  authorizationCodesRemove(options: RemoveAuthorizationCodeOptions): Promise<void>;
   authorizationCodesSave(options: SaveAuthorizationCodeOptions): Promise<void>;
 
   accessTokenFind(options: FindAccessTokenOptions): Promise<UserClientToken>;
@@ -24,56 +82,6 @@ export default interface DatabaseAdapter {
   refreshTokenSave(options: SaveRefreshTokenOptions): Promise<void>;
   refreshTokenRemoveByIds(options: RemoveRefreshTokenByIdsOptions): Promise<void>;
 }
-
-export type ClientSecret = string;
-
-export type CheckResult = boolean;
-
-export type AuthProvider = "github" | "discord" | "google" | "twitter" | "email" | "spotify";
-
-export type Client = {
-  id: string;
-  name: string;
-  redirectUri: string;
-  secret: string;
-  trusted?: boolean;
-  owner: string;
-};
-
-export type User = {
-  uid: string;
-  username: string;
-  avatar?: string;
-  scopes: Array<string>;
-  providers?: ProviderReferences;
-  private?: boolean;
-};
-
-export type ProviderReferences = {
-  discord?: string;
-};
-
-export type ProviderProfile = {
-  uid: string;
-  providerId: string;
-  username: string;
-  avatar?: string;
-  accessToken: string;
-  refreshToken?: string;
-};
-
-export type AuthorizationCode = {
-  code: string;
-  clientId: string;
-  redirectUri: string;
-  uid: string;
-};
-
-export type UserClientToken = {
-  token: string;
-  clientId: string;
-  uid: string;
-};
 
 export type FindClientByIdOptions = {
   clientId: string;
@@ -112,19 +120,19 @@ export type FindUserByIdOptions = {
 export type CreateUserOptions = {
   uid: string;
   username: string;
-  avatar?: string;
+  avatar: string | null;
   scopes: Array<string>;
-  private?: boolean;
+  private: boolean;
 };
 
 export type UpdateOrCreateProviderProfileOptions = {
   provider: AuthProvider;
-  uid: string;
   providerId: string;
+  uid: string;
   username: string;
-  avatar?: string;
+  avatar: string | null;
   accessToken: string;
-  refreshToken?: string;
+  refreshToken: string | null;
 };
 
 export type FindProviderProfileByIdOptions = {
@@ -133,6 +141,10 @@ export type FindProviderProfileByIdOptions = {
 };
 
 export type FindAuthorizationCodeOptions = {
+  authorizationCode: string;
+};
+
+export type RemoveAuthorizationCodeOptions = {
   authorizationCode: string;
 };
 
@@ -145,8 +157,8 @@ export type FindAccessTokenOptions = {
 };
 
 export type FindAccessTokenByIdOptions = {
-  clientId: string;
   uid: string;
+  clientId: string;
 };
 
 export type SaveAccessTokenOptions = {
@@ -162,8 +174,8 @@ export type FindRefreshTokenOptions = {
 };
 
 export type FindRefreshTokenByIdOptions = {
-  clientId: string;
   uid: string;
+  clientId: string;
 };
 
 export type SaveRefreshTokenOptions = {

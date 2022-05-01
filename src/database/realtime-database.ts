@@ -14,12 +14,15 @@ import DatabaseAdapter, {
   FindRefreshTokenOptions,
   FindUserByIdOptions,
   ProviderProfile,
+  ProviderReferences,
   RegenerateClientSecretOptions,
   RemoveAccessTokenByIdsOptions,
+  RemoveAuthorizationCodeOptions,
   RemoveRefreshTokenByIdsOptions,
   SaveAccessTokenOptions,
   SaveAuthorizationCodeOptions,
   SaveRefreshTokenOptions,
+  TokenReference,
   UpdateClientNameOptions,
   UpdateClientRedirectUriOptions,
   UpdateOrCreateProviderProfileOptions,
@@ -42,6 +45,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
   authorizationCodes: Reference;
   accessTokens: Reference;
   refreshTokens: Reference;
+  tokens: Reference;
 
   constructor(database: Database) {
     this.database = database;
@@ -51,6 +55,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     this.authorizationCodes = database.ref("authorizationCodes");
     this.accessTokens = database.ref("accessTokens");
     this.refreshTokens = database.ref("refreshTokens");
+    this.tokens = database.ref("tokens");
   }
   async clientFindById(options: FindClientByIdOptions): Promise<Client> {
     return (await this.clients.child(options.clientId).get()).val();
@@ -72,6 +77,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
       trusted: false
     };
     await this.clients.child(options.id).set(client);
+    await this.profiles.child(options.ownerUid).child("clients").push(options.id);
     return token;
   }
   async clientUpdateName(options: UpdateClientNameOptions): Promise<void> {
@@ -95,6 +101,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     const secret = (await this.clients.child(options.clientId).child("secret").get()).val();
     return await argon2.verify(secret, options.secret);
   }
+
   async userFindById(options: FindUserByIdOptions): Promise<User> {
     return (await this.profiles.child(options.uid).get()).val();
   }
@@ -117,40 +124,65 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
       accessToken: options.accessToken,
       refreshToken: options.refreshToken
     };
-    await this.providers.child(options.provider).child(options.providerId).set(providerProfile);
+    await this.providers.child(options.provider).child(options.providerId).update(providerProfile);
+    const providerReferences: ProviderReferences = {};
+    providerReferences[options.provider] = options.providerId;
+    await this.profiles.child(options.uid).update({
+      providers: providerReferences
+    });
     return providerProfile;
   }
   async userProviderProfileFindById(options: FindProviderProfileByIdOptions): Promise<ProviderProfile> {
     return (await this.providers.child(options.provider).child(options.providerId).get()).val();
   }
+
   async authorizationCodesFind(options: FindAuthorizationCodeOptions): Promise<AuthorizationCode> {
     return (await this.authorizationCodes.child(options.authorizationCode).get()).val();
+  }
+  async authorizationCodesRemove(options: RemoveAuthorizationCodeOptions): Promise<void> {
+    await this.authorizationCodes.child(options.authorizationCode).remove();
   }
   async authorizationCodesSave(options: SaveAuthorizationCodeOptions): Promise<void> {
     await this.authorizationCodes.child(options.authorizationCode.code).set(options.authorizationCode);
   }
+
   async accessTokenFind(options: FindAccessTokenOptions): Promise<UserClientToken> {
     return (await this.accessTokens.child(options.accessToken).get()).val();
   }
-  accessTokenFindByIds(options: FindAccessTokenByIdOptions): Promise<UserClientToken> {
-    throw new Error("Method not implemented.");
+  async accessTokenFindByIds(options: FindAccessTokenByIdOptions): Promise<UserClientToken> {
+    const reference = (await this.tokens.child(options.uid).child("accessTokens").orderByChild("clientId").equalTo(options.clientId).get()).val();
+    return (await this.accessTokens.child(reference.token).get()).val();
   }
-  accessTokenSave(options: SaveAccessTokenOptions): Promise<void> {
-    throw new Error("Method not implemented.");
+  async accessTokenSave(options: SaveAccessTokenOptions): Promise<void> {
+    await this.accessTokens.child(options.accessToken.token).set(options.accessToken);
+    const tokenReference: TokenReference = {
+      token: options.accessToken.token,
+      clientId: options.accessToken.clientId
+    };
+    await this.tokens.child(options.accessToken.uid).child("accessTokens").child(options.accessToken.token).set(tokenReference);
   }
-  accessTokenRemoveByIds(options: RemoveAccessTokenByIdsOptions): Promise<void> {
-    throw new Error("Method not implemented.");
+  async accessTokenRemoveByIds(options: RemoveAccessTokenByIdsOptions): Promise<void> {
+    await this.accessTokens.child(options.accessToken.token).remove();
+    await this.tokens.child(options.accessToken.uid).child("accessTokens").child(options.accessToken.token).remove();
   }
-  refreshTokenFind(options: FindRefreshTokenOptions): Promise<UserClientToken> {
-    throw new Error("Method not implemented.");
+
+  async refreshTokenFind(options: FindRefreshTokenOptions): Promise<UserClientToken> {
+    return (await this.refreshTokens.child(options.refreshToken).get()).val();
   }
-  refreshTokenFindByIds(options: FindRefreshTokenByIdOptions): Promise<UserClientToken> {
-    throw new Error("Method not implemented.");
+  async refreshTokenFindByIds(options: FindRefreshTokenByIdOptions): Promise<UserClientToken> {
+    const reference = (await this.tokens.child(options.uid).child("refreshTokens").orderByChild("clientId").equalTo(options.clientId).get()).val();
+    return (await this.refreshTokens.child(reference.token).get()).val();
   }
-  refreshTokenSave(options: SaveRefreshTokenOptions): Promise<void> {
-    throw new Error("Method not implemented.");
+  async refreshTokenSave(options: SaveRefreshTokenOptions): Promise<void> {
+    await this.refreshTokens.child(options.refreshToken.token).set(options.refreshToken);
+    const tokenReference: TokenReference = {
+      token: options.refreshToken.token,
+      clientId: options.refreshToken.clientId
+    };
+    await this.tokens.child(options.refreshToken.uid).child("refreshTokens").child(options.refreshToken.token).set(tokenReference);
   }
-  refreshTokenRemoveByIds(options: RemoveRefreshTokenByIdsOptions): Promise<void> {
-    throw new Error("Method not implemented.");
+  async refreshTokenRemoveByIds(options: RemoveRefreshTokenByIdsOptions): Promise<void> {
+    await this.refreshTokens.child(options.refreshToken.token).remove();
+    await this.tokens.child(options.refreshToken.uid).child("refreshTokens").child(options.refreshToken.token).remove();
   }
 }

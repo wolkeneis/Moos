@@ -55,7 +55,9 @@ export default class FirestoreStore extends Store {
       .doc(sid)
       .set({ data: sessionJson })
       .then(() => {
-        callback!();
+        if (callback) {
+          callback();
+        }
       });
   };
 
