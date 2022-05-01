@@ -76,12 +76,12 @@ export default interface DatabaseAdapter {
 
   accessTokenFind(options: FindAccessTokenOptions): Promise<UserClientToken>;
   accessTokenFindByIds(options: FindAccessTokenByIdOptions): Promise<UserClientToken>;
-  accessTokenSave(options: SaveAccessTokenOptions): Promise<void>;
+  accessTokenSave(options: SaveAccessTokenOptions): Promise<UserClientToken>;
   accessTokenRemoveByIds(options: RemoveAccessTokenByIdsOptions): Promise<void>;
 
   refreshTokenFind(options: FindRefreshTokenOptions): Promise<UserClientToken>;
   refreshTokenFindByIds(options: FindRefreshTokenByIdOptions): Promise<UserClientToken>;
-  refreshTokenSave(options: SaveRefreshTokenOptions): Promise<void>;
+  refreshTokenSave(options: SaveRefreshTokenOptions): Promise<UserClientToken>;
   refreshTokenRemoveByIds(options: RemoveRefreshTokenByIdsOptions): Promise<void>;
 }
 
@@ -94,7 +94,6 @@ export type CreateClientOptions = {
   name: string;
   redirectUri: string;
   ownerUid: string;
-  creationDate: number;
 };
 
 export type UpdateClientNameOptions = {
@@ -126,7 +125,6 @@ export type CreateUserOptions = {
   avatar: string | null;
   scopes: Array<string>;
   private: boolean;
-  creationDate: number;
 };
 
 export type UpdateOrCreateProviderProfileOptions = {
@@ -153,7 +151,10 @@ export type RemoveAuthorizationCodeOptions = {
 };
 
 export type SaveAuthorizationCodeOptions = {
-  authorizationCode: AuthorizationCode;
+  code: string;
+  clientId: string;
+  redirectUri: string;
+  uid: string;
 };
 
 export type FindAccessTokenOptions = {
@@ -166,7 +167,9 @@ export type FindAccessTokenByIdOptions = {
 };
 
 export type SaveAccessTokenOptions = {
-  accessToken: UserClientToken;
+  token: string;
+  uid: string;
+  clientId: string;
 };
 
 export type RemoveAccessTokenByIdsOptions = {
@@ -183,7 +186,9 @@ export type FindRefreshTokenByIdOptions = {
 };
 
 export type SaveRefreshTokenOptions = {
-  refreshToken: UserClientToken;
+  token: string;
+  uid: string;
+  clientId: string;
 };
 
 export type RemoveRefreshTokenByIdsOptions = {

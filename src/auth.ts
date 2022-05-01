@@ -17,8 +17,7 @@ export async function createUser(username: string, avatar: string | null): Promi
           scopes: [],
           uid: user.uid,
           username: username,
-          private: false,
-          creationDate: Date.now()
+          private: false
         })
         .then(() => {
           return resolve(user.uid);

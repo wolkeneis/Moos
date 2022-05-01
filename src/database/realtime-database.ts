@@ -75,7 +75,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
       owner: options.ownerUid,
       secret: secret,
       trusted: false,
-      creationDate: options.creationDate
+      creationDate: Date.now()
     };
     await this.clients.child(options.id).set(client);
     await this.profiles.child(options.ownerUid).child("clients").push(options.id);
@@ -113,7 +113,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
       username: options.username,
       avatar: options.avatar,
       private: options.private,
-      creationDate: options.creationDate
+      creationDate: Date.now()
     };
     await this.profiles.child(options.uid).set(user);
   }
@@ -145,7 +145,11 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     await this.authorizationCodes.child(options.authorizationCode).remove();
   }
   async authorizationCodesSave(options: SaveAuthorizationCodeOptions): Promise<void> {
-    await this.authorizationCodes.child(options.authorizationCode.code).set(options.authorizationCode);
+    const authorizationCode: AuthorizationCode = {
+      ...options,
+      creationDate: Date.now()
+    };
+    await this.authorizationCodes.child(options.code).set(authorizationCode);
   }
 
   async accessTokenFind(options: FindAccessTokenOptions): Promise<UserClientToken> {
@@ -155,13 +159,18 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     const reference = (await this.tokens.child(options.uid).child("accessTokens").orderByChild("clientId").equalTo(options.clientId).get()).val();
     return (await this.accessTokens.child(reference.token).get()).val();
   }
-  async accessTokenSave(options: SaveAccessTokenOptions): Promise<void> {
-    await this.accessTokens.child(options.accessToken.token).set(options.accessToken);
-    const tokenReference: TokenReference = {
-      token: options.accessToken.token,
-      clientId: options.accessToken.clientId
+  async accessTokenSave(options: SaveAccessTokenOptions): Promise<UserClientToken> {
+    const accessToken: UserClientToken = {
+      ...options,
+      creationDate: Date.now()
     };
-    await this.tokens.child(options.accessToken.uid).child("accessTokens").child(options.accessToken.token).set(tokenReference);
+    await this.accessTokens.child(options.token).set(accessToken);
+    const tokenReference: TokenReference = {
+      token: options.token,
+      clientId: options.clientId
+    };
+    await this.tokens.child(options.uid).child("accessTokens").child(options.token).set(tokenReference);
+    return accessToken;
   }
   async accessTokenRemoveByIds(options: RemoveAccessTokenByIdsOptions): Promise<void> {
     await this.accessTokens.child(options.accessToken.token).remove();
@@ -175,13 +184,18 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     const reference = (await this.tokens.child(options.uid).child("refreshTokens").orderByChild("clientId").equalTo(options.clientId).get()).val();
     return (await this.refreshTokens.child(reference.token).get()).val();
   }
-  async refreshTokenSave(options: SaveRefreshTokenOptions): Promise<void> {
-    await this.refreshTokens.child(options.refreshToken.token).set(options.refreshToken);
-    const tokenReference: TokenReference = {
-      token: options.refreshToken.token,
-      clientId: options.refreshToken.clientId
+  async refreshTokenSave(options: SaveRefreshTokenOptions): Promise<UserClientToken> {
+    const refreshToken: UserClientToken = {
+      ...options,
+      creationDate: Date.now()
     };
-    await this.tokens.child(options.refreshToken.uid).child("refreshTokens").child(options.refreshToken.token).set(tokenReference);
+    await this.refreshTokens.child(options.token).set(refreshToken);
+    const tokenReference: TokenReference = {
+      token: options.token,
+      clientId: options.clientId
+    };
+    await this.tokens.child(options.uid).child("refreshTokens").child(options.token).set(tokenReference);
+    return refreshToken;
   }
   async refreshTokenRemoveByIds(options: RemoveRefreshTokenByIdsOptions): Promise<void> {
     await this.refreshTokens.child(options.refreshToken.token).remove();

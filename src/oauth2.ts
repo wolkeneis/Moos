@@ -26,14 +26,12 @@ function issueTokens(clientId: string, uid: string, done: IssueTokensDoneFunctio
   database
     .userFindById({ uid: uid })
     .then((user) => {
-      const accessToken: UserClientToken = { token: randomToken(256), uid: user.uid, clientId: clientId, creationDate: Date.now() };
-      const refreshToken: UserClientToken = { token: randomToken(256), uid: user.uid, clientId: clientId, creationDate: Date.now() };
       database
-        .accessTokenSave({ accessToken: accessToken })
-        .then(() => {
+        .accessTokenSave({ token: randomToken(256), uid: user.uid, clientId: clientId })
+        .then((accessToken) => {
           database
-            .refreshTokenSave({ refreshToken: refreshToken })
-            .then(() => {
+            .refreshTokenSave({ token: randomToken(256), uid: user.uid, clientId: clientId })
+            .then((refreshToken) => {
               return done(null, accessToken, refreshToken);
             })
             .catch(done);
@@ -47,15 +45,13 @@ function issueTokens(clientId: string, uid: string, done: IssueTokensDoneFunctio
 server.grant(
   oauth2orize.grant.code((client: Client, redirectUri, user: User, done) => {
     const code: string = randomToken(256);
-    const authorizationCode: AuthorizationCode = {
-      code: code,
-      clientId: client.id,
-      redirectUri: redirectUri,
-      uid: user.uid,
-      creationDate: Date.now()
-    };
     database
-      .authorizationCodesSave({ authorizationCode: authorizationCode })
+      .authorizationCodesSave({
+        code: code,
+        clientId: client.id,
+        redirectUri: redirectUri,
+        uid: user.uid
+      })
       .then(() => {
         return done(null, code);
       })
