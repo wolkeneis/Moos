@@ -93,7 +93,7 @@ export type CreateClientOptions = {
   id: string;
   name: string;
   redirectUri: string;
-  ownerUid: string;
+  owner: string;
 };
 
 export type UpdateClientNameOptions = {

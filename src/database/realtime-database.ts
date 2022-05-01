@@ -69,16 +69,13 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
       parallelism: 1 //Threads
     });
     const client: Client = {
-      id: options.id,
-      name: options.name,
-      redirectUri: options.redirectUri,
-      owner: options.ownerUid,
+      ...options,
       secret: secret,
       trusted: false,
       creationDate: Date.now()
     };
-    await this.clients.child(options.id).set(client);
-    await this.profiles.child(options.ownerUid).child("clients").push(options.id);
+    await this.clients.child(client.id).set(client);
+    await this.profiles.child(client.owner).child("clients").push(client.id);
     return token;
   }
   async clientUpdateName(options: UpdateClientNameOptions): Promise<void> {
@@ -108,28 +105,19 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
   }
   async userCreate(options: CreateUserOptions): Promise<void> {
     const user: User = {
-      uid: options.uid,
-      scopes: options.scopes,
-      username: options.username,
-      avatar: options.avatar,
-      private: options.private,
+      ...options,
       creationDate: Date.now()
     };
-    await this.profiles.child(options.uid).set(user);
+    await this.profiles.child(user.uid).set(user);
   }
   async userProviderProfileUpdateOrCreate(options: UpdateOrCreateProviderProfileOptions): Promise<ProviderProfile> {
     const providerProfile: ProviderProfile = {
-      providerId: options.providerId,
-      uid: options.uid,
-      username: options.username,
-      avatar: options.avatar,
-      accessToken: options.accessToken,
-      refreshToken: options.refreshToken
+      ...options
     };
-    await this.providers.child(options.provider).child(options.providerId).update(providerProfile);
+    await this.providers.child(options.provider).child(providerProfile.providerId).update(providerProfile);
     const providerReferences: ProviderReferences = {};
-    providerReferences[options.provider] = options.providerId;
-    await this.profiles.child(options.uid).update({
+    providerReferences[options.provider] = providerProfile.providerId;
+    await this.profiles.child(providerProfile.uid).update({
       providers: providerReferences
     });
     return providerProfile;
