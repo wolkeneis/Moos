@@ -3,7 +3,7 @@ import cors from "cors";
 import express from "express";
 import "./environment";
 import { env } from "./environment";
-import { login, oauth2 } from "./routes";
+import { login, oauth2, cookie } from "./routes";
 import { passportMiddleware } from "./strategies";
 
 const app = express();
@@ -21,7 +21,7 @@ app.use(
         callback(new Error("Not allowed by CORS: " + origin));
       }
     },
-    allowedHeaders: "X-Requested-With, Content-Type",
+    allowedHeaders: "X-Requested-With, Content-Type, CSRF-Token",
     credentials: true
   })
 );
@@ -33,6 +33,7 @@ app.use(passportMiddleware);
 
 app.use("/oauth2", oauth2);
 app.use("/login", login);
+app.use("/cookie", cookie);
 
 app.get("/", (req, res) => {
   res.sendStatus(200);

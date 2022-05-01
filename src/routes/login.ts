@@ -1,8 +1,9 @@
-import express from "express";
-import passport from "passport";
 import { createToken } from "../auth";
 import { envRequire } from "../environment";
+import express from "express";
+import passport from "passport";
 import { csrfMiddleware } from "../session";
+
 import "../strategies";
 
 const router = express.Router();
@@ -26,7 +27,7 @@ router.get(
     createToken((req.user as { uid: string }).uid)
       .then((token) => {
         res.redirect(
-          envRequire("CONTROL_ORIGIN") + `/redirect/session?token=${encodeURIComponent(token)}&_csrf=${encodeURIComponent(req.csrfToken())}`
+          `${envRequire("CONTROL_ORIGIN")}/redirect/session?token=${encodeURIComponent(token)}&_csrf=${encodeURIComponent(req.csrfToken())}`
         );
       })
       .catch(() => res.sendStatus(500));
