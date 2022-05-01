@@ -1,3 +1,6 @@
+import argon2 from "argon2";
+import crypto from "crypto";
+import { Reference } from "firebase-admin/database";
 import { Database } from "firebase-admin/lib/database/database";
 import DatabaseAdapter, {
   AuthorizationCode,
@@ -29,9 +32,6 @@ import DatabaseAdapter, {
   User,
   UserClientToken
 } from "./database-adapter";
-import argon2 from "argon2";
-import crypto from "crypto";
-import { Reference } from "firebase-admin/database";
 
 function _randomToken(length: number): string {
   return crypto.randomBytes(length).toString("hex");
@@ -74,7 +74,8 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
       redirectUri: options.redirectUri,
       owner: options.ownerUid,
       secret: secret,
-      trusted: false
+      trusted: false,
+      creationDate: options.creationDate
     };
     await this.clients.child(options.id).set(client);
     await this.profiles.child(options.ownerUid).child("clients").push(options.id);
@@ -111,7 +112,8 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
       scopes: options.scopes,
       username: options.username,
       avatar: options.avatar,
-      private: options.private
+      private: options.private,
+      creationDate: options.creationDate
     };
     await this.profiles.child(options.uid).set(user);
   }

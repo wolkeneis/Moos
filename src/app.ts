@@ -1,11 +1,10 @@
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import "./environment";
 import { env } from "./environment";
-import { oauth2, login } from "./routes";
-import { sessionMiddleware } from "./session";
-import { passportMiddleware, passportSessionMiddleware } from "./strategies";
-import cookieParser from "cookie-parser";
+import { login, oauth2 } from "./routes";
+import { passportMiddleware } from "./strategies";
 
 const app = express();
 
@@ -30,9 +29,7 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(sessionMiddleware);
 app.use(passportMiddleware);
-app.use(passportSessionMiddleware);
 
 app.use("/oauth2", oauth2);
 app.use("/login", login);

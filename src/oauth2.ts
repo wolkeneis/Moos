@@ -1,7 +1,7 @@
 import crypto from "crypto";
+import oauth2orize, { DeserializeClientDoneFunction } from "oauth2orize";
 import database from "./database";
 import { AuthorizationCode, Client, User, UserClientToken } from "./database/database-adapter";
-import oauth2orize, { DeserializeClientDoneFunction } from "oauth2orize";
 
 const server = oauth2orize.createServer();
 
@@ -77,6 +77,14 @@ server.exchange(
         if (!authorizationCode) return done(new Error("Authorization Code not found"));
         if (client.id !== authorizationCode.clientId) return done(null, false);
         if (redirectUri !== authorizationCode.redirectUri) return done(null, false);
+        if (authorizationCode.creationDate + 1000 * 60 * 2 < Date.now()) {
+          return database
+            .authorizationCodesRemove({
+              authorizationCode: code
+            })
+            .catch(() => null)
+            .then(() => done(new Error("Authorization Code expired")));
+        }
         issueTokens(client.id, authorizationCode.uid, (error, accessToken, refreshToken): void =>
           done(error, accessToken?.token, refreshToken?.token)
         );

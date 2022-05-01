@@ -1,9 +1,8 @@
-import { createToken } from "../auth";
-import { envRequire } from "../environment";
 import express from "express";
 import passport from "passport";
+import { createToken } from "../auth";
+import { envRequire } from "../environment";
 import { csrfMiddleware } from "../session";
-
 import "../strategies";
 
 const router = express.Router();
@@ -21,7 +20,6 @@ router.get(
     failureRedirect: "/login"
   }),
   (req, res) => {
-    console.log(req.user);
     if (!req.user) {
       return res.sendStatus(500);
     }

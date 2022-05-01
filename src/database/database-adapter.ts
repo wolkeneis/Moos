@@ -11,6 +11,7 @@ export type Client = {
   secret: string;
   trusted: boolean;
   owner: string;
+  creationDate: number;
 };
 
 export type User = {
@@ -20,6 +21,7 @@ export type User = {
   scopes: Array<string>;
   providers?: ProviderReferences;
   private: boolean;
+  creationDate: number;
 };
 
 export type ProviderReferences = {
@@ -92,6 +94,7 @@ export type CreateClientOptions = {
   name: string;
   redirectUri: string;
   ownerUid: string;
+  creationDate: number;
 };
 
 export type UpdateClientNameOptions = {
@@ -123,6 +126,7 @@ export type CreateUserOptions = {
   avatar: string | null;
   scopes: Array<string>;
   private: boolean;
+  creationDate: number;
 };
 
 export type UpdateOrCreateProviderProfileOptions = {

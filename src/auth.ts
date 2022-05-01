@@ -1,6 +1,6 @@
 import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
-import { auth } from "./firebase";
 import database from "./database";
+import { auth } from "./firebase";
 
 export async function createUser(username: string, avatar: string | null): Promise<string> {
   return new Promise<string>(async (resolve, reject) => {
@@ -17,7 +17,8 @@ export async function createUser(username: string, avatar: string | null): Promi
           scopes: [],
           uid: user.uid,
           username: username,
-          private: false
+          private: false,
+          creationDate: Date.now()
         })
         .then(() => {
           return resolve(user.uid);

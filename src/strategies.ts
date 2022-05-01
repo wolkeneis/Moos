@@ -10,7 +10,6 @@ import { Client, User } from "./database/database-adapter";
 import { envRequire } from "./environment";
 
 export const passportMiddleware = passport.initialize();
-export const passportSessionMiddleware = passport.session();
 
 passport.serializeUser((user, done) => {
   done(null, (user as User).uid);
@@ -48,6 +47,7 @@ passport.use(
       .accessTokenFind({ accessToken: accessToken })
       .then((token) => {
         if (!token) return done(null);
+        if (token.creationDate + 1000 * 60 * 60) return done(new Error("Access Token expired"));
         database
           .userFindById({ uid: token.uid })
           .then((user) => {
