@@ -9,26 +9,22 @@ const router: Router = express.Router();
 router.use(csrfMiddleware);
 
 router.post("/request", (req, res) => {
-  console.log(req.body);
-
   const token = req.body.token;
   if (!token) {
     return res.sendStatus(400);
   }
-  createCookie(token)
-    .then((cookie) => {
-      res
-        .cookie("session", cookie, {
-          path: "/",
-          sameSite: "none",
-          httpOnly: true,
-          secure: env("NODE_ENV") !== "development",
-          maxAge: 604800000
-        })
-        .status(204)
-        .end();
-    })
-    .catch((error) => console.log(error));
+  createCookie(token).then((cookie) => {
+    res
+      .cookie("session", cookie, {
+        path: "/",
+        sameSite: "none",
+        httpOnly: true,
+        secure: env("NODE_ENV") !== "development",
+        maxAge: 604800000
+      })
+      .status(204)
+      .end();
+  });
 });
 
 router.delete("/revoke", (req, res) => {

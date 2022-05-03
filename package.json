@@ -24,12 +24,10 @@
     "prepare": "husky install"
   },
   "devDependencies": {
-    "@types/connect-ensure-login": "^0.1.7",
     "@types/cookie-parser": "^1.4.2",
     "@types/cors": "^2.8.12",
     "@types/csurf": "^1.11.2",
     "@types/express": "^4.17.13",
-    "@types/express-session": "^1.17.4",
     "@types/node": "^17.0.24",
     "@types/oauth2orize": "^1.8.10",
     "@types/passport": "^1.0.7",
@@ -56,15 +54,12 @@
   },
   "dependencies": {
     "argon2": "^0.28.5",
-    "connect-ensure-login": "^0.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "csurf": "^1.11.0",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
-    "express-session": "^1.17.2",
     "firebase-admin": "^10.0.2",
-    "node-fetch": "^3.2.3",
     "oauth2orize": "^1.11.1",
     "passport": "^0.5.2",
     "passport-discord": "^0.1.4",

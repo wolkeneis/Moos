@@ -1,17 +1,16 @@
-import { ensureLoggedIn } from "connect-ensure-login";
 import express, { Router } from "express";
 import passport from "passport";
 import database from "../database";
 import { Client, User } from "../database/database-adapter";
 import { envRequire } from "../environment";
 import server from "../oauth2";
-import { csrfMiddleware } from "../session";
+import { csrfMiddleware, ensureLoggedIn } from "../session";
 
 const router: Router = express.Router();
 
 router.get(
   "/authorize",
-  ensureLoggedIn("/login"),
+  ensureLoggedIn("/redirect/login"),
   csrfMiddleware,
   server.authorization(
     (clientId, redirectUri, done) => {
