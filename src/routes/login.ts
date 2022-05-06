@@ -2,7 +2,7 @@ import { createToken } from "../auth";
 import { envRequire } from "../environment";
 import express from "express";
 import passport from "passport";
-import { csrfMiddleware } from "../session";
+import { csrfMiddleware } from "../middleware";
 
 import "../strategies";
 
@@ -11,7 +11,7 @@ const router = express.Router();
 router.use(csrfMiddleware);
 
 router.get("/", (req, res) => {
-  res.redirect(process.env.CONTROL_ORIGIN + "/redirect/profile");
+  res.redirect(process.env.CONTROL_ORIGIN + "/redirect/login");
 });
 
 router.get("/discord", passport.authenticate("discord"));

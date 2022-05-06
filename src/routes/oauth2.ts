@@ -4,7 +4,7 @@ import database from "../database";
 import { Client, User } from "../database/database-adapter";
 import { envRequire } from "../environment";
 import server from "../oauth2";
-import { csrfMiddleware, ensureLoggedIn } from "../session";
+import { csrfMiddleware, ensureLoggedIn } from "../middleware";
 
 const router: Router = express.Router();
 

@@ -2,7 +2,7 @@ import express, { Router } from "express";
 import { auth } from "../firebase";
 import { createCookie, verifyCookie } from "../auth";
 import { env, envRequire } from "../environment";
-import { csrfMiddleware } from "../session";
+import { csrfMiddleware } from "../middleware";
 
 const router: Router = express.Router();
 

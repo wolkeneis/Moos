@@ -1,6 +1,6 @@
-import { verifyCookie } from "./auth";
 import csurf from "csurf";
-import { Request, RequestHandler } from "express";
+import { RequestHandler } from "express";
+import { verifyCookie } from "./auth";
 import "./environment";
 import { env } from "./environment";
 
@@ -16,19 +16,19 @@ export const csrfMiddleware = csurf({
 
 export const ensureLoggedIn = (redirect?: string): RequestHandler => {
   return (req, res, next) => {
-  if (req.cookies.session) {
-    verifyCookie(req.cookies.session).then((token) => {
-      if (token) {
-        req.token = token;
-        next();
-      } else {
-        if (redirect) {
-          res.redirect(redirect);
+    if (req.cookies.session) {
+      verifyCookie(req.cookies.session).then((token) => {
+        if (token) {
+          req.token = token;
+          next();
         } else {
-          res.sendStatus(403);
+          if (redirect) {
+            res.redirect(redirect);
+          } else {
+            res.sendStatus(403);
+          }
         }
-      }
-    });
-  }
+      });
+    }
+  };
 };
-}
