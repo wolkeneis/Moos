@@ -3,7 +3,7 @@ import cors from "cors";
 import express from "express";
 import "./environment";
 import { env } from "./environment";
-import { login, oauth2, cookie, api } from "./routes";
+import { login, oauth2, api } from "./routes";
 import { passportMiddleware } from "./strategies";
 
 const app = express();
@@ -33,7 +33,6 @@ app.use(passportMiddleware);
 
 app.use("/oauth2", oauth2);
 app.use("/login", login);
-app.use("/cookie", cookie);
 app.use("/api", api);
 
 app.get("/", (req, res) => {
