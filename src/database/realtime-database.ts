@@ -16,6 +16,7 @@ import DatabaseAdapter, {
   FindRefreshTokenByIdOptions,
   FindRefreshTokenOptions,
   FindUserByIdOptions,
+  PatchUserOptiopns,
   ProviderProfile,
   ProviderReferences,
   RegenerateClientSecretOptions,
@@ -110,6 +111,11 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
       creationDate: Date.now()
     };
     await this.profiles.child(user.uid).set(user);
+  }
+  async userPatch(options: PatchUserOptiopns): Promise<void> {
+    if (options.private !== undefined) {
+      await this.profiles.child(options.uid).child("private").update(options.private);
+    }
   }
   async userProviderProfileUpdateOrCreate(options: UpdateOrCreateProviderProfileOptions): Promise<ProviderProfile> {
     const providerProfile: ProviderProfile = {

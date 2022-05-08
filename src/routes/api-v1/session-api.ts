@@ -8,7 +8,7 @@ const router: Router = express.Router();
 
 router.use(csrfMiddleware);
 
-router.post("/request", async (req, res) => {
+router.post("/", async (req, res) => {
   const token = req.body.token;
   if (!token) {
     return res.sendStatus(400);
@@ -30,7 +30,7 @@ router.post("/request", async (req, res) => {
   }
 });
 
-router.delete("/revoke", async (req, res) => {
+router.delete("/", async (req, res) => {
   const sessionCookie = req.cookies.session || "";
   res.clearCookie("session");
   try {

@@ -8,7 +8,7 @@ export interface User {
   uid: string;
   username: string;
   avatar: string | null;
-  scopes: Array<string>;
+  scopes: "*"[];
   private: boolean;
   providers?: ProviderReferences;
   clients: Array<string>;
@@ -16,10 +16,11 @@ export interface User {
 }
 
 export type ProviderReferences = {
-  discord?: string;
+  [key in AuthProvider]?: string;
 };
 
 export type ProviderProfile = {
+  provider: AuthProvider;
   uid: string;
   providerId: string;
   username: string;
@@ -68,6 +69,7 @@ export default interface DatabaseAdapter {
 
   userFindById(options: FindUserByIdOptions): Promise<User>;
   userCreate(options: CreateUserOptions): Promise<void>;
+  userPatch(options: PatchUserOptiopns): Promise<void>;
   userProviderProfileUpdateOrCreate(options: UpdateOrCreateProviderProfileOptions): Promise<ProviderProfile>;
   userProviderProfileFindById(options: FindProviderProfileByIdOptions): Promise<ProviderProfile>;
 
@@ -124,8 +126,13 @@ export type CreateUserOptions = {
   uid: string;
   username: string;
   avatar: string | null;
-  scopes: Array<string>;
+  scopes: "*"[];
   private: boolean;
+};
+
+export type PatchUserOptiopns = {
+  uid: string;
+  private?: boolean;
 };
 
 export type UpdateOrCreateProviderProfileOptions = {
