@@ -106,6 +106,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
   async userCreate(options: CreateUserOptions): Promise<void> {
     const user: User = {
       ...options,
+      clients: [],
       creationDate: Date.now()
     };
     await this.profiles.child(user.uid).set(user);

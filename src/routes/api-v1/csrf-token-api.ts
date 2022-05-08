@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { csrfMiddleware } from "middleware";
+import { csrfMiddleware } from "../../middleware";
 
 const router: Router = express.Router();
 

@@ -4,38 +4,39 @@ export type CheckResult = boolean;
 
 export type AuthProvider = "discord";
 
-export type Client = {
-  id: string;
-  name: string;
-  redirectUri: string;
-  secret: string;
-  trusted: boolean;
-  owner: string;
-  creationDate: number;
-};
-
-export type User = {
+export interface User {
   uid: string;
   username: string;
   avatar: string | null;
   scopes: Array<string>;
-  providers?: ProviderReferences;
   private: boolean;
+  providers?: ProviderReferences;
+  clients: Array<string>;
   creationDate: number;
-};
+}
 
 export type ProviderReferences = {
   discord?: string;
 };
 
 export type ProviderProfile = {
-  providerId: string;
   uid: string;
+  providerId: string;
   username: string;
   avatar: string | null;
   accessToken: string;
   refreshToken: string | null;
 };
+
+export interface Client {
+  id: string;
+  name: string;
+  redirectUri: string;
+  owner: string;
+  secret: string;
+  trusted: boolean;
+  creationDate: number;
+}
 
 export type AuthorizationCode = {
   code: string;

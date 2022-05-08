@@ -1,9 +1,8 @@
-import { createToken } from "../auth";
-import { env, envRequire } from "../environment";
 import express from "express";
 import passport from "passport";
+import { createToken } from "../auth";
+import { env, envRequire } from "../environment";
 import { csrfMiddleware } from "../middleware";
-
 import "../strategies";
 
 const router = express.Router();

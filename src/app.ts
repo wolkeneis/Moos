@@ -3,7 +3,7 @@ import cors from "cors";
 import express from "express";
 import "./environment";
 import { env } from "./environment";
-import { login, oauth2, api } from "./routes";
+import { api, login, oauth2 } from "./routes";
 import { passportMiddleware } from "./strategies";
 
 const app = express();

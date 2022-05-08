@@ -1,10 +1,10 @@
+import { Client, User } from "database/database-adapter";
 import express, { Router } from "express";
 import passport from "passport";
 import database from "../database";
-import { Client, User } from "../database/database-adapter";
 import { envRequire } from "../environment";
-import server from "../oauth2";
 import { csrfMiddleware, ensureLoggedIn } from "../middleware";
+import server from "../oauth2";
 
 const router: Router = express.Router();
 

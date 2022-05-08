@@ -1,3 +1,4 @@
+import { Client, User } from "database/database-adapter";
 import { Request } from "express";
 import passport from "passport";
 import { Profile, Strategy as DiscordStrategy } from "passport-discord";
@@ -6,7 +7,6 @@ import { Strategy as BearerStrategy } from "passport-http-bearer";
 import { Strategy as ClientPasswordStrategy } from "passport-oauth2-client-password";
 import { createUser, verifyCookie } from "./auth";
 import database from "./database";
-import { Client, User } from "./database/database-adapter";
 import { envRequire } from "./environment";
 
 export const passportMiddleware = passport.initialize();
