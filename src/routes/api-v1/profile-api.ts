@@ -6,7 +6,7 @@ import { csrfMiddleware, ensureLoggedIn } from "../../middleware";
 const router: Router = express.Router();
 
 router.use(csrfMiddleware);
-router.use(ensureLoggedIn("/login"));
+router.use(ensureLoggedIn());
 
 router.post("/", async (req, res) => {
   const profile = req.user as User;

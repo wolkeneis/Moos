@@ -1,9 +1,9 @@
 import csurf from "csurf";
 import { RequestHandler } from "express";
 import { verifyCookie } from "./auth";
+import database from "./database";
 import "./environment";
 import { env } from "./environment";
-import database from "./database";
 
 export const csrfMiddleware = csurf({
   cookie: {
@@ -37,6 +37,8 @@ export const ensureLoggedIn = (redirect?: string): RequestHandler => {
           return res.sendStatus(403);
         }
       }
+    } else {
+      return res.sendStatus(403);
     }
   };
 };
