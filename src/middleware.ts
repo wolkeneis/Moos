@@ -31,7 +31,7 @@ export const ensureLoggedIn = (redirect?: string): RequestHandler => {
           return next("User not found");
         }
       } else {
-        if (redirect) {
+        if (redirect && req.method === "GET") {
           return res.redirect(redirect);
         } else {
           return res.sendStatus(403);
