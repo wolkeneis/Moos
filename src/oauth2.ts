@@ -11,35 +11,28 @@ function randomToken(length: number) {
 
 server.serializeClient((client: Client, done) => done(null, client.id));
 
-server.deserializeClient((clientId: string, done: DeserializeClientDoneFunction) => {
-  database
-    .clientFindById({ clientId: clientId })
-    .then((client) => {
-      return done(null, client);
-    })
-    .catch(done);
+server.deserializeClient(async (clientId: string, done: DeserializeClientDoneFunction) => {
+  try {
+    const client = await database.clientFindById({ clientId: clientId });
+    return done(null, client);
+  } catch (error) {
+    done(error as Error);
+  }
 });
 
 type IssueTokensDoneFunction = (error: Error | null, accessToken?: UserClientToken, refreshToken?: UserClientToken) => void;
 
-function issueTokens(clientId: string, uid: string, done: IssueTokensDoneFunction) {
-  database
-    .userFindById({ uid: uid })
-    .then((user) => {
-      database
-        .accessTokenSave({ token: randomToken(256), uid: user.uid, clientId: clientId })
-        .then((accessToken) => {
-          database
-            .refreshTokenSave({ token: randomToken(256), uid: user.uid, clientId: clientId })
-            .then((refreshToken) => {
-              return done(null, accessToken, refreshToken);
-            })
-            .catch(done);
-        })
-        .catch(done);
-      if (!user) return done(new Error("User not found"));
-    })
-    .catch(done);
+type Tokens = {
+  accessToken: UserClientToken;
+  refreshToken: UserClientToken;
+};
+
+async function issueTokens(clientId: string, uid: string, done: IssueTokensDoneFunction): Promise<Tokens> {
+  const user = await database.userFindById({ uid: uid });
+  if (!user) throw new Error("User not found");
+  const accessToken = await database.accessTokenSave({ token: randomToken(256), uid: user.uid, clientId: clientId });
+  const refreshToken = await database.refreshTokenSave({ token: randomToken(256), uid: user.uid, clientId: clientId });
+  return { accessToken: accessToken, refreshToken: refreshToken };
 }
 
 server.grant(
