@@ -168,8 +168,9 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     return accessToken;
   }
   async accessTokenRemoveByIds(options: RemoveAccessTokenByIdsOptions): Promise<void> {
-    await this.accessTokens.child(options.accessToken.token).remove();
-    await this.tokens.child(options.accessToken.uid).child("accessTokens").child(options.accessToken.token).remove();
+    const accessToken = await this.accessTokenFindByIds({uid: options.uid, clientId: options.clientId});
+    await this.accessTokens.child(accessToken.token).remove();
+    await this.tokens.child(accessToken.uid).child("accessTokens").child(accessToken.token).remove();
   }
 
   async refreshTokenFind(options: FindRefreshTokenOptions): Promise<UserClientToken> {
@@ -193,7 +194,8 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     return refreshToken;
   }
   async refreshTokenRemoveByIds(options: RemoveRefreshTokenByIdsOptions): Promise<void> {
-    await this.refreshTokens.child(options.refreshToken.token).remove();
-    await this.tokens.child(options.refreshToken.uid).child("refreshTokens").child(options.refreshToken.token).remove();
+    const refreshToken = await this.refreshTokenFindByIds({ uid: options.uid, clientId: options.clientId });
+    await this.refreshTokens.child(refreshToken.token).remove();
+    await this.tokens.child(refreshToken.uid).child("refreshTokens").child(refreshToken.token).remove();
   }
 }

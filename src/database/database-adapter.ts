@@ -181,7 +181,8 @@ export type SaveAccessTokenOptions = {
 };
 
 export type RemoveAccessTokenByIdsOptions = {
-  accessToken: UserClientToken;
+  uid: string;
+  clientId: string;
 };
 
 export type FindRefreshTokenOptions = {
@@ -200,5 +201,6 @@ export type SaveRefreshTokenOptions = {
 };
 
 export type RemoveRefreshTokenByIdsOptions = {
-  refreshToken: UserClientToken;
+  uid: string;
+  clientId: string;
 };
