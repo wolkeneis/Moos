@@ -15,26 +15,25 @@ passport.serializeUser((user, done) => {
   done(null, (user as User).uid);
 });
 
-passport.deserializeUser((uid: string, done) => {
-  database
-    .userFindById({ uid: uid })
-    .then((user) => done(null, user))
-    .catch(done);
+passport.deserializeUser(async (uid: string, done) => {
+  try {
+    const user = await database.userFindById({ uid: uid });
+    done(null, user);
+  } catch (error) {
+    done(error as Error);
+  }
 });
 
-function verifyClient(clientId: string, clientSecret: string, done: (error: Error | null, client?: Client) => void) {
-  database
-    .clientFindById({ clientId: clientId })
-    .then((client) => {
-      if (!client) return done(null);
-      database
-        .clientCheckSecret({ clientId: clientId, secret: clientSecret })
-        .then((successful) => {
-          if (!successful) return done(null);
-        })
-        .catch(done);
-    })
-    .catch(done);
+async function verifyClient(clientId: string, clientSecret: string, done: (error: Error | null, client?: Client) => void) {
+  try {
+    const client = await database.clientFindById({ clientId: clientId });
+    if (!client) return done(null);
+    const successful = await database.clientCheckSecret({ clientId: clientId, secret: clientSecret });
+    if (!successful) return done(null);
+    return done(null, client);
+  } catch (error) {
+    done(error as Error);
+  }
 }
 
 passport.use(new BasicStrategy(verifyClient));
@@ -42,21 +41,17 @@ passport.use(new BasicStrategy(verifyClient));
 passport.use(new ClientPasswordStrategy(verifyClient));
 
 passport.use(
-  new BearerStrategy((accessToken, done) => {
-    database
-      .accessTokenFind({ accessToken: accessToken })
-      .then((token) => {
-        if (!token) return done(null);
-        if (token.creationDate + 1000 * 60 * 60) return done(new Error("Access Token expired"));
-        database
-          .userFindById({ uid: token.uid })
-          .then((user) => {
-            if (!user) return done(null);
-            done(null, user, { scope: ["*"] });
-          })
-          .catch(done);
-      })
-      .catch(done);
+  new BearerStrategy(async (accessToken, done) => {
+    try {
+      const token = await database.accessTokenFind({ accessToken: accessToken });
+      if (!token) return done(null);
+      if (token.creationDate + 1000 * 60 * 60) return done(new Error("Access Token expired"));
+      const user = await database.userFindById({ uid: token.uid });
+      if (!user) return done(null);
+      done(null, user, { scope: ["*"] });
+    } catch (error) {
+      done(error as Error);
+    }
   })
 );
 

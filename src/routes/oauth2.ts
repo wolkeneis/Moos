@@ -13,28 +13,28 @@ router.get(
   ensureLoggedIn("/redirect/login"),
   csrfMiddleware,
   server.authorization(
-    (clientId, redirectUri, done) => {
-      database
-        .clientFindById({ clientId: clientId })
-        .then((client) => {
-          if (!client) return done(new Error("Client not found"));
-          if (client.redirectUri === redirectUri) {
-            return done(null, client, redirectUri);
-          } else {
-            return done(new Error("Redirect URIs do not match"));
-          }
-        })
-        .catch(done);
+    async (clientId, redirectUri, done) => {
+      try {
+        const client = await database.clientFindById({ clientId: clientId });
+        if (!client) return done(new Error("Client not found"));
+        if (client.redirectUri === redirectUri) {
+          return done(null, client, redirectUri);
+        } else {
+          return done(new Error("Redirect URIs do not match"));
+        }
+      } catch (error) {
+        done(error as Error);
+      }
     },
-    (client: Client, user: User, scope, type, areq, done) => {
+    async (client: Client, user: User, scope, type, areq, done) => {
       if (client.trusted) return done(null, true, null, null);
-      database
-        .accessTokenFindByIds({ clientId: client.id, uid: user.uid })
-        .then((token) => {
-          if (token) return done(null, true, null, null);
-          return done(null, false, null, null);
-        })
-        .catch((error) => done(error, false, null, null));
+      try {
+        const token = await database.accessTokenFindByIds({ clientId: client.id, uid: user.uid });
+        if (token) return done(null, true, null, null);
+        return done(null, false, null, null);
+      } catch (error) {
+        done(error as Error, false, null, null);
+      }
     }
   ),
   (req, res) => {

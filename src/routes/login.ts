@@ -19,17 +19,18 @@ router.get(
   passport.authenticate("discord", {
     failureRedirect: "/login"
   }),
-  (req, res) => {
+  async (req, res) => {
     if (!req.user) {
       return res.sendStatus(500);
     }
-    createToken((req.user as { uid: string }).uid)
-      .then((token) => {
-        res.redirect(
-          `${envRequire("CONTROL_ORIGIN")}/redirect/session?token=${encodeURIComponent(token)}&_csrf=${encodeURIComponent(req.csrfToken())}`
-        );
-      })
-      .catch(() => res.sendStatus(500));
+    try {
+      const token = await createToken((req.user as { uid: string }).uid);
+      res.redirect(
+        `${envRequire("CONTROL_ORIGIN")}/redirect/session?token=${encodeURIComponent(token)}&_csrf=${encodeURIComponent(req.csrfToken())}`
+      );
+    } catch {
+      res.sendStatus(500);
+    }
   }
 );
 
