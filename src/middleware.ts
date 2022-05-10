@@ -1,9 +1,12 @@
 import csurf from "csurf";
 import { RequestHandler } from "express";
+import passport from "passport";
 import { verifyCookie } from "./auth";
 import database from "./database";
 import "./environment";
 import { env } from "./environment";
+
+export const passportMiddleware = passport.initialize();
 
 export const csrfMiddleware = csurf({
   cookie: {

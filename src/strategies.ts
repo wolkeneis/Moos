@@ -9,8 +9,6 @@ import { createUser, verifyCookie } from "./auth";
 import database from "./database";
 import { envRequire } from "./environment";
 
-export const passportMiddleware = passport.initialize();
-
 passport.serializeUser((user, done) => {
   done(null, (user as User).uid);
 });
