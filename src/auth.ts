@@ -3,30 +3,20 @@ import database from "./database";
 import { auth } from "./firebase";
 
 export async function createUser(username: string, avatar: string | null): Promise<string> {
-  return new Promise<string>(async (resolve, reject) => {
-    try {
-      const user = await auth.createUser({
-        disabled: false,
-        displayName: username,
-        emailVerified: false,
-        photoURL: avatar
-      });
-      database
-        .userCreate({
-          avatar: avatar,
-          scopes: [],
-          uid: user.uid,
-          username: username,
-          private: false
-        })
-        .then(() => {
-          return resolve(user.uid);
-        })
-        .catch(reject);
-    } catch (error) {
-      return reject(error);
-    }
+  const user = await auth.createUser({
+    disabled: false,
+    displayName: username,
+    emailVerified: false,
+    photoURL: avatar
   });
+  await database.userCreate({
+    avatar: avatar,
+    scopes: [],
+    uid: user.uid,
+    username: username,
+    private: false
+  });
+  return user.uid;
 }
 
 export function verifyCookie(cookie: string): Promise<DecodedIdToken | null> {
