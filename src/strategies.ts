@@ -1,5 +1,6 @@
 import { Client, User } from "database/database-adapter";
 import { Request } from "express";
+import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
 import passport from "passport";
 import { Profile, Strategy as DiscordStrategy } from "passport-discord";
 import { BasicStrategy } from "passport-http";
@@ -66,9 +67,9 @@ passport.use(
     },
     async (req: Request, accessToken: string, refreshToken: string, profile: Profile, done) => {
       try {
-        const token = await verifyCookie(req.cookies.session);
+        let token: DecodedIdToken | null;
         let uid: string;
-        if (token) {
+        if (req.cookies.session && (token = await verifyCookie(req.cookies.session))) {
           uid = token.uid;
         } else {
           const foundProfile = await database.userProviderProfileFindById({ provider: profile.provider, providerId: profile.id });
