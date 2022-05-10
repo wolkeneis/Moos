@@ -20,8 +20,6 @@ server.deserializeClient(async (clientId: string, done: DeserializeClientDoneFun
   }
 });
 
-type IssueTokensDoneFunction = (error: Error | null, accessToken?: UserClientToken, refreshToken?: UserClientToken) => void;
-
 type Tokens = {
   accessToken: UserClientToken;
   refreshToken: UserClientToken;

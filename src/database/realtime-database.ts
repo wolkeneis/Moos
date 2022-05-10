@@ -168,7 +168,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     return accessToken;
   }
   async accessTokenRemoveByIds(options: RemoveAccessTokenByIdsOptions): Promise<void> {
-    const accessToken = await this.accessTokenFindByIds({uid: options.uid, clientId: options.clientId});
+    const accessToken = await this.accessTokenFindByIds({ uid: options.uid, clientId: options.clientId });
     await this.accessTokens.child(accessToken.token).remove();
     await this.tokens.child(accessToken.uid).child("accessTokens").child(accessToken.token).remove();
   }
