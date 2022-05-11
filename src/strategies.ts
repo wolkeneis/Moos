@@ -2,10 +2,12 @@ import { Client, User } from "database/database-adapter";
 import { Request } from "express";
 import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
 import passport from "passport";
-import { Profile, Strategy as DiscordStrategy } from "passport-discord";
+import { Profile as DiscordProfile, Strategy as DiscordStrategy } from "passport-discord";
+import { Profile as GoogleProfile, Strategy as GoogleStrategy, VerifyCallback } from "passport-google-oauth20";
 import { BasicStrategy } from "passport-http";
 import { Strategy as BearerStrategy } from "passport-http-bearer";
 import { Strategy as ClientPasswordStrategy } from "passport-oauth2-client-password";
+import { v4 as uuidv4 } from "uuid";
 import { createUser, verifyCookie } from "./auth";
 import database from "./database";
 import { envRequire } from "./environment";
@@ -54,7 +56,7 @@ passport.use(
   })
 );
 
-const scopes = ["identify"];
+const discordScopes = ["identify"];
 
 passport.use(
   new DiscordStrategy(
@@ -62,10 +64,12 @@ passport.use(
       clientID: envRequire("DISCORD_CLIENT_ID"),
       clientSecret: envRequire("DISCORD_CLIENT_SECRET"),
       callbackURL: envRequire("DISCORD_CALLBACK_URL"),
-      scope: scopes,
+      scope: discordScopes,
       passReqToCallback: true
     },
-    async (req: Request, accessToken: string, refreshToken: string, profile: Profile, done) => {
+    async (req: Request, accessToken: string, refreshToken: string, profile: DiscordProfile, done) => {
+      const username = profile.username + "#" + profile.discriminator;
+      const avatar = profile.avatar ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png` : null;
       try {
         let token: DecodedIdToken | null;
         let uid: string;
@@ -76,20 +80,61 @@ passport.use(
           if (foundProfile) {
             uid = foundProfile.uid;
           } else {
-            uid = await createUser(
-              profile.username + "#" + profile.discriminator,
-              profile.avatar ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png` : null
-            );
+            uid = await createUser(username, avatar);
           }
         }
         const user = await database.userProviderProfileUpdateOrCreate({
           provider: "discord",
           uid: uid,
           providerId: profile.id,
-          username: profile.username + "#" + profile.discriminator,
-          avatar: profile.avatar ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png` : null,
+          username: username,
+          avatar: avatar,
           accessToken: accessToken,
           refreshToken: refreshToken
+        });
+        done(null, { uid: user.uid });
+      } catch (error) {
+        done(error as Error);
+      }
+    }
+  )
+);
+
+const googleScopes = ["profile"];
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: envRequire("GOOGLE_CLIENT_ID"),
+      clientSecret: envRequire("GOOGLE_CLIENT_SECRET"),
+      callbackURL: envRequire("GOOGLE_CALLBACK_URL"),
+      passReqToCallback: true,
+      scope: googleScopes
+    },
+    async (req: Request, accessToken: string, refreshToken: string, profile: GoogleProfile, done: VerifyCallback) => {
+      const username = profile.username ? profile.username : uuidv4();
+      const avatar = profile.photos && profile.photos[0] ? profile.photos[0].value : null;
+      try {
+        let token: DecodedIdToken | null;
+        let uid: string;
+        if (req.cookies.session && (token = await verifyCookie(req.cookies.session))) {
+          uid = token.uid;
+        } else {
+          const foundProfile = await database.userProviderProfileFindById({ provider: profile.provider, providerId: profile.id });
+          if (foundProfile) {
+            uid = foundProfile.uid;
+          } else {
+            uid = await createUser(username, avatar);
+          }
+        }
+        const user = await database.userProviderProfileUpdateOrCreate({
+          provider: "google",
+          uid: uid,
+          providerId: profile.id,
+          username: username,
+          avatar: avatar,
+          accessToken: accessToken,
+          refreshToken: refreshToken ? refreshToken : null
         });
         done(null, { uid: user.uid });
       } catch (error) {

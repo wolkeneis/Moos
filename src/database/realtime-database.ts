@@ -124,9 +124,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     await this.providers.child(options.provider).child(providerProfile.providerId).update(providerProfile);
     const providerReferences: ProviderReferences = {};
     providerReferences[options.provider] = providerProfile.providerId;
-    await this.profiles.child(providerProfile.uid).update({
-      providers: providerReferences
-    });
+    await this.profiles.child(providerProfile.uid).child("providers").update(providerReferences);
     return providerProfile;
   }
   async userProviderProfileFindById(options: FindProviderProfileByIdOptions): Promise<ProviderProfile> {

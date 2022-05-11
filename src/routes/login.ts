@@ -34,4 +34,25 @@ router.get(
   }
 );
 
+router.get("/google", passport.authenticate("google"));
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "/login"
+  }),
+  async (req, res) => {
+    if (!req.user) {
+      return res.sendStatus(500);
+    }
+    try {
+      const token = await createToken((req.user as { uid: string }).uid);
+      res.redirect(
+        `${envRequire("CONTROL_ORIGIN")}/redirect/session?token=${encodeURIComponent(token)}&_csrf=${encodeURIComponent(req.csrfToken())}`
+      );
+    } catch {
+      res.sendStatus(500);
+    }
+  }
+);
+
 export default router;

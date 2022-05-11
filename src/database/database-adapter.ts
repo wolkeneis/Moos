@@ -2,7 +2,7 @@ export type ClientSecret = string;
 
 export type CheckResult = boolean;
 
-export type AuthProvider = "discord";
+export type AuthProvider = "discord" | "google";
 
 export interface User {
   uid: string;
