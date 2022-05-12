@@ -1,4 +1,4 @@
-import { env, envRequire } from "environment";
+import { env, envRequire } from "./environment";
 import admin, { ServiceAccount } from "firebase-admin";
 
 const app = admin.initializeApp({
