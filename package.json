@@ -15,9 +15,9 @@
   "scripts": {
     "prestart": "npm run build",
     "start": "node -r source-map-support/register dist/app.js",
-    "watch": "nodemon -e ts -L -w src --exec \"npm run start\"",
+    "watch": "nodemon -e ts -L -w src --exec \"yarn start\"",
     "lint": "eslint --ext ts .",
-    "lint:fix": "npm run lint --fix",
+    "lint:fix": "yarn lint --fix",
     "pretty": "prettier --write .",
     "build": "tsc --incremental",
     "clean": "rm -rf dist",
