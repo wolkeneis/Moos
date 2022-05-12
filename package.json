@@ -13,9 +13,9 @@
   },
   "homepage": "https://moos.wolkeneis.dev/",
   "scripts": {
-    "prestart": "npm run build",
     "start": "node -r source-map-support/register dist/app.js",
-    "watch": "nodemon -e ts -L -w src --exec \"yarn start\"",
+    "restart": "yarn build && yarn start",
+    "watch": "nodemon -e ts -L -w src --exec \"yarn restart\"",
     "lint": "eslint --ext ts .",
     "lint:fix": "yarn lint --fix",
     "pretty": "prettier --write .",
@@ -24,20 +24,6 @@
     "prepare": "husky install"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.23.0",
-    "@typescript-eslint/parser": "^5.23.0",
-    "eslint": "^8.15.0",
-    "eslint-config-prettier": "^8.5.0",
-    "husky": "^8.0.1",
-    "lint-staged": "^12.4.1",
-    "nodemon": "^2.0.16",
-    "prettier": "2.6.2"
-  },
-  "lint-staged": {
-    "*.{js,ts}": "eslint --ext ts --cache --fix",
-    "*.{js,ts,css,md,json}": "prettier --write"
-  },
-  "dependencies": {
     "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.12",
     "@types/csurf": "^1.11.2",
@@ -51,6 +37,23 @@
     "@types/passport-http-bearer": "^1.0.37",
     "@types/passport-oauth2-client-password": "^0.1.2",
     "@types/uuid": "^8.3.4",
+    "@typescript-eslint/eslint-plugin": "^5.23.0",
+    "@typescript-eslint/parser": "^5.23.0",
+    "eslint": "^8.15.0",
+    "eslint-config-prettier": "^8.5.0",
+    "husky": "^8.0.1",
+    "lint-staged": "^12.4.1",
+    "nodemon": "^2.0.16",
+    "prettier": "2.6.2",
+    "source-map-support": "^0.5.21",
+    "typescript": "^4.6.4",
+    "ts-node": "^10.7.0"
+  },
+  "lint-staged": {
+    "*.{js,ts}": "eslint --ext ts --cache --fix",
+    "*.{js,ts,css,md,json}": "prettier --write"
+  },
+  "dependencies": {
     "argon2": "^0.28.5",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -66,9 +69,6 @@
     "passport-http": "^0.3.0",
     "passport-http-bearer": "^1.0.1",
     "passport-oauth2-client-password": "^0.1.2",
-    "typescript": "^4.6.4",
-    "uuid": "^8.3.2",
-    "source-map-support": "^0.5.21",
-    "ts-node": "^10.7.0"
+    "uuid": "^8.3.2"
   }
 }
