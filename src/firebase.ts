@@ -1,8 +1,10 @@
 import admin, { ServiceAccount } from "firebase-admin";
-import serviceAccount from "./security/service-account.json";
 
 const app = admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount as ServiceAccount),
+  credential: admin.credential.cert(
+    (process.env.SERVICE_ACCOUNT ? (JSON.parse(process.env.SERVICE_ACCOUNT) as ServiceAccount) : undefined) ??
+      (import("./security/service-account.json") as ServiceAccount)
+  ),
   databaseURL: "https://wolkeneis-default-rtdb.europe-west1.firebasedatabase.app"
 });
 
