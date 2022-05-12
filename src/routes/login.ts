@@ -28,7 +28,8 @@ router.get(
       res.redirect(
         `${envRequire("CONTROL_ORIGIN")}/redirect/session?token=${encodeURIComponent(token)}&_csrf=${encodeURIComponent(req.csrfToken())}`
       );
-    } catch {
+    } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   }
@@ -42,8 +43,6 @@ router.get(
   }),
   async (req, res) => {
     if (!req.user) {
-      console.log(122222);
-
       return res.sendStatus(500);
     }
     try {
@@ -51,8 +50,8 @@ router.get(
       res.redirect(
         `${envRequire("CONTROL_ORIGIN")}/redirect/session?token=${encodeURIComponent(token)}&_csrf=${encodeURIComponent(req.csrfToken())}`
       );
-    } catch {
-      console.log(222222);
+    } catch (error) {
+      console.error(error);
       res.sendStatus(500);
     }
   }
