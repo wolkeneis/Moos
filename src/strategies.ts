@@ -114,19 +114,24 @@ passport.use(
     async (req: Request, accessToken: string, refreshToken: string, profile: GoogleProfile, done: VerifyCallback) => {
       const username = profile.username ? profile.username : uuidv4();
       const avatar = profile.photos && profile.photos[0] ? profile.photos[0].value : null;
+      console.log(username, avatar, 1);
       try {
         let token: DecodedIdToken | null;
         let uid: string;
         if (req.cookies.session && (token = await verifyCookie(req.cookies.session))) {
+          console.log(3, req.cookies.session);
           uid = token.uid;
         } else {
           const foundProfile = await database.userProviderProfileFindById({ provider: profile.provider, providerId: profile.id });
+          console.log(5, foundProfile);
           if (foundProfile) {
             uid = foundProfile.uid;
           } else {
             uid = await createUser(username, avatar);
+            console.log(7, uid);
           }
         }
+        console.log(uid, 2);
         const user = await database.userProviderProfileUpdateOrCreate({
           provider: "google",
           uid: uid,
@@ -136,7 +141,8 @@ passport.use(
           accessToken: accessToken,
           refreshToken: refreshToken ? refreshToken : null
         });
-        done(null, { uid: user.uid });
+        console.log(9, user);
+        done(null, { uid: uid });
       } catch (error) {
         done(error as Error);
       }
