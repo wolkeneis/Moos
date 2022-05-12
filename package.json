@@ -19,7 +19,7 @@
     "lint": "eslint --ext ts .",
     "lint:fix": "npm run lint --fix",
     "pretty": "prettier --write .",
-    "build": "npx tsc --incremental",
+    "build": "npm run tsc --incremental",
     "clean": "rm -rf dist",
     "prepare": "husky install"
   },
