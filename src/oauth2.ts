@@ -75,7 +75,9 @@ server.exchange(
           await database.authorizationCodesRemove({
             authorizationCode: code
           });
-        } catch {}
+        } catch (error) {
+          console.error(error);
+        }
         done(new Error("Authorization Code expired"));
       }
       const tokens = await issueTokens(client.id, authorizationCode.uid);
