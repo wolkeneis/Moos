@@ -5,7 +5,7 @@ specifiers:
   '@types/cors': ^2.8.12
   '@types/csurf': ^1.11.2
   '@types/express': ^4.17.13
-  '@types/node': ^17.0.32
+  '@types/node': ^17.0.33
   '@types/oauth2orize': ^1.8.10
   '@types/passport': ^1.0.7
   '@types/passport-discord': ^0.1.5
@@ -58,6 +58,7 @@ dependencies:
   passport-http: 0.3.0
   passport-http-bearer: 1.0.1
   passport-oauth2-client-password: 0.1.2
+  source-map-support: 0.5.21
   uuid: 8.3.2
 
 devDependencies:
@@ -65,7 +66,7 @@ devDependencies:
   '@types/cors': 2.8.12
   '@types/csurf': 1.11.2
   '@types/express': 4.17.13
-  '@types/node': 17.0.32
+  '@types/node': 17.0.33
   '@types/oauth2orize': 1.8.10
   '@types/passport': 1.0.7
   '@types/passport-discord': 0.1.5
@@ -82,8 +83,7 @@ devDependencies:
   lint-staged: 12.4.1
   nodemon: 2.0.16
   prettier: 2.6.2
-  source-map-support: 0.5.21
-  ts-node: 10.7.0_sm5zkxj4s52nbddwl76qwfh6ya
+  ts-node: 10.7.0_2e3zkt3gzqz6r43dj4x46rot3i
   typescript: 4.6.4
 
 packages:
@@ -274,7 +274,7 @@ packages:
     engines: {node: ^8.13.0 || >=10.10.0}
     dependencies:
       '@grpc/proto-loader': 0.6.12
-      '@types/node': 17.0.32
+      '@types/node': 17.0.33
     dev: false
     optional: true
 
@@ -445,19 +445,19 @@ packages:
   /@types/accepts/1.3.5:
     resolution: {integrity: sha512-jOdnI/3qTpHABjM5cx1Hc0sKsPoYCp+DP/GJRGtDlPd7fiV9oXGGIcjW/ZOxLIvjGz8MA+uMZI9metHlgqbgwQ==}
     dependencies:
-      '@types/node': 17.0.32
+      '@types/node': 17.0.33
     dev: true
 
   /@types/body-parser/1.19.2:
     resolution: {integrity: sha512-ALYone6pm6QmwZoAgeyNksccT9Q4AWZQ6PvfwR37GT6r6FWUPguq6sUmNGSMV2Wr761oQoBxwGGa6DR5o1DC9g==}
     dependencies:
       '@types/connect': 3.4.35
-      '@types/node': 17.0.32
+      '@types/node': 17.0.33
 
   /@types/connect/3.4.35:
     resolution: {integrity: sha512-cdeYyv4KWoEgpBISTxWvqYsVy444DOqehiF3fM3ne10AmJ62RSyNkUnxMJXHQWRQQX2eR94m5y1IZyDwBjV9FQ==}
     dependencies:
-      '@types/node': 17.0.32
+      '@types/node': 17.0.33
 
   /@types/content-disposition/0.5.4:
     resolution: {integrity: sha512-0mPF08jn9zYI0n0Q/Pnz7C4kThdSt+6LD4amsrYDDpgBfrVWa3TcCOxKX1zkGgYniGagRv8heN2cbh+CAn+uuQ==}
@@ -475,7 +475,7 @@ packages:
       '@types/connect': 3.4.35
       '@types/express': 4.17.13
       '@types/keygrip': 1.0.2
-      '@types/node': 17.0.32
+      '@types/node': 17.0.33
     dev: true
 
   /@types/cors/2.8.12:
@@ -491,7 +491,7 @@ packages:
   /@types/express-serve-static-core/4.17.28:
     resolution: {integrity: sha512-P1BJAEAW3E2DJUlkgq4tOL3RyMunoWXqbSCygWo5ZIWTjUgN1YnaXWW4VWl/oc8vs/XoYibEGBKP0uZyF4AHig==}
     dependencies:
-      '@types/node': 17.0.32
+      '@types/node': 17.0.33
       '@types/qs': 6.9.7
       '@types/range-parser': 1.2.4
 
@@ -522,7 +522,7 @@ packages:
   /@types/keyv/3.1.4:
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
     dependencies:
-      '@types/node': 17.0.32
+      '@types/node': 17.0.33
     dev: true
 
   /@types/koa-compose/3.2.5:
@@ -541,7 +541,7 @@ packages:
       '@types/http-errors': 1.8.2
       '@types/keygrip': 1.0.2
       '@types/koa-compose': 3.2.5
-      '@types/node': 17.0.32
+      '@types/node': 17.0.33
     dev: true
 
   /@types/long/4.0.2:
@@ -552,20 +552,20 @@ packages:
   /@types/mime/1.3.2:
     resolution: {integrity: sha512-YATxVxgRqNH6nHEIsvg6k2Boc1JHI9ZbH5iWFFv/MTkchz3b1ieGDa5T0a9RznNdI0KhVbdbWSN+KWWrQZRxTw==}
 
-  /@types/node/17.0.32:
-    resolution: {integrity: sha512-eAIcfAvhf/BkHcf4pkLJ7ECpBAhh9kcxRBpip9cTiO+hf+aJrsxYxBeS6OXvOd9WqNAJmavXVpZvY1rBjNsXmw==}
+  /@types/node/17.0.33:
+    resolution: {integrity: sha512-miWq2m2FiQZmaHfdZNcbpp9PuXg34W5JZ5CrJ/BaS70VuhoJENBEQybeiYSaPBRNq6KQGnjfEnc/F3PN++D+XQ==}
 
   /@types/oauth/0.9.1:
     resolution: {integrity: sha512-a1iY62/a3yhZ7qH7cNUsxoI3U/0Fe9+RnuFrpTKr+0WVOzbKlSLojShCKe20aOD1Sppv+i8Zlq0pLDuTJnwS4A==}
     dependencies:
-      '@types/node': 17.0.32
+      '@types/node': 17.0.33
     dev: true
 
   /@types/oauth2orize/1.8.10:
     resolution: {integrity: sha512-6MI5FTvKLWlN0/CfXSOyYR/2HK4/HgQcPUBeXOyN6P3E5f4ZOUdeAyzzNdElJapRT/P48Va+FYsxnf/e2QWyug==}
     dependencies:
       '@types/express': 4.17.13
-      '@types/node': 17.0.32
+      '@types/node': 17.0.33
     dev: true
 
   /@types/passport-discord/0.1.5:
@@ -629,14 +629,14 @@ packages:
   /@types/responselike/1.0.0:
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
     dependencies:
-      '@types/node': 17.0.32
+      '@types/node': 17.0.33
     dev: true
 
   /@types/serve-static/1.13.10:
     resolution: {integrity: sha512-nCkHGI4w7ZgAdNkrEu0bv+4xNV/XDqW+DydknebMOQwkpDGx8G+HTlj7R7ABI8i8nKxVw0wtKPi1D+lPOkh4YQ==}
     dependencies:
       '@types/mime': 1.3.2
-      '@types/node': 17.0.32
+      '@types/node': 17.0.33
 
   /@types/uuid/8.3.4:
     resolution: {integrity: sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==}
@@ -1015,7 +1015,7 @@ packages:
 
   /buffer-from/1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
-    dev: true
+    dev: false
 
   /bytes/3.1.2:
     resolution: {integrity: sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg==}
@@ -1739,7 +1739,7 @@ packages:
     dependencies:
       '@firebase/database-compat': 0.1.8
       '@firebase/database-types': 0.9.8
-      '@types/node': 17.0.32
+      '@types/node': 17.0.33
       dicer: 0.3.1
       jsonwebtoken: 8.5.1
       jwks-rsa: 2.1.1
@@ -2948,7 +2948,7 @@ packages:
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
       '@types/long': 4.0.2
-      '@types/node': 17.0.32
+      '@types/node': 17.0.33
       long: 4.0.0
     dev: false
     optional: true
@@ -3284,12 +3284,12 @@ packages:
     dependencies:
       buffer-from: 1.1.2
       source-map: 0.6.1
-    dev: true
+    dev: false
 
   /source-map/0.6.1:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
     engines: {node: '>=0.10.0'}
-    dev: true
+    dev: false
 
   /statuses/1.5.0:
     resolution: {integrity: sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=}
@@ -3466,7 +3466,7 @@ packages:
     resolution: {integrity: sha1-gYT9NH2snNwYWZLzpmIuFLnZq2o=}
     dev: false
 
-  /ts-node/10.7.0_sm5zkxj4s52nbddwl76qwfh6ya:
+  /ts-node/10.7.0_2e3zkt3gzqz6r43dj4x46rot3i:
     resolution: {integrity: sha512-TbIGS4xgJoX2i3do417KSaep1uRAW/Lu+WAL2doDHC0D6ummjirVOXU5/7aiZotbQ5p1Zp9tP7U6cYhA0O7M8A==}
     hasBin: true
     peerDependencies:
@@ -3485,7 +3485,7 @@ packages:
       '@tsconfig/node12': 1.0.9
       '@tsconfig/node14': 1.0.1
       '@tsconfig/node16': 1.0.2
-      '@types/node': 17.0.32
+      '@types/node': 17.0.33
       acorn: 8.7.0
       acorn-walk: 8.2.0
       arg: 4.1.3
