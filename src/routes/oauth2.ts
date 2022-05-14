@@ -1,4 +1,4 @@
-import { Client, User } from "database/database-adapter";
+import { Application, User } from "database/database-adapter";
 import express, { Router } from "express";
 import passport from "passport";
 import database from "../database";
@@ -13,12 +13,12 @@ router.get(
   ensureLoggedIn("/redirect/login"),
   csrfMiddleware,
   server.authorization(
-    async (clientId, redirectUri, done) => {
+    async (applicationId, redirectUri, done) => {
       try {
-        const client = await database.clientFindById({ clientId: clientId });
-        if (!client) return done(new Error("Client not found"));
-        if (client.redirectUri === redirectUri) {
-          return done(null, client, redirectUri);
+        const application = await database.applicationFindById({ applicationId: applicationId });
+        if (!application) return done(new Error("Application not found"));
+        if (application.redirectUri === redirectUri) {
+          return done(null, application, redirectUri);
         } else {
           return done(new Error("Redirect URIs do not match"));
         }
@@ -26,10 +26,10 @@ router.get(
         done(error as Error);
       }
     },
-    async (client: Client, user: User, scope, type, areq, done) => {
-      if (client.trusted) return done(null, true, null, null);
+    async (application: Application, user: User, scope, type, areq, done) => {
+      if (application.trusted) return done(null, true, null, null);
       try {
-        const token = await database.accessTokenFindByIds({ clientId: client.id, uid: user.uid });
+        const token = await database.accessTokenFindByIds({ applicationId: application.id, uid: user.uid });
         if (token) return done(null, true, null, null);
         return done(null, false, null, null);
       } catch (error) {
@@ -43,7 +43,7 @@ router.get(
       envRequire("CONTROL_ORIGIN") +
         `/redirect/authorize?transactionId=${encodeURIComponent(req.oauth2.transactionID)}&username=${encodeURIComponent(
           req.oauth2.user.username
-        )}&client=${encodeURIComponent(req.oauth2.client.name)}&_csrf=${encodeURIComponent(req.csrfToken())}`
+        )}&application=${encodeURIComponent(req.oauth2.client.name)}&_csrf=${encodeURIComponent(req.csrfToken())}`
     );
   }
 );

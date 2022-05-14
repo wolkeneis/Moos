@@ -1,4 +1,4 @@
-export type ClientSecret = string;
+export type ApplicationSecret = string;
 
 export type CheckResult = boolean;
 
@@ -11,7 +11,7 @@ export interface User {
   scopes: "*"[];
   private: boolean;
   providers?: ProviderReferences;
-  clients: Array<string>;
+  applications: Array<string>;
   creationDate: number;
 }
 
@@ -29,7 +29,7 @@ export type ProviderProfile = {
   refreshToken: string | null;
 };
 
-export interface Client {
+export interface Application {
   id: string;
   name: string;
   redirectUri: string;
@@ -41,31 +41,31 @@ export interface Client {
 
 export type AuthorizationCode = {
   code: string;
-  clientId: string;
+  applicationId: string;
   redirectUri: string;
   uid: string;
   creationDate: number;
 };
 
-export type UserClientToken = {
+export type ApplicationToken = {
   token: string;
   uid: string;
-  clientId: string;
+  applicationId: string;
   creationDate: number;
 };
 
 export type TokenReference = {
   token: string;
-  clientId: string;
+  applicationId: string;
 };
 
 export default interface DatabaseAdapter {
-  clientFindById(options: FindClientByIdOptions): Promise<Client>;
-  clientCreate(options: CreateClientOptions): Promise<ClientSecret>;
-  clientUpdateName(options: UpdateClientNameOptions): Promise<void>;
-  clientUpdateRedirectUri(options: UpdateClientRedirectUriOptions): Promise<void>;
-  clientRegenerateSecret(options: RegenerateClientSecretOptions): Promise<ClientSecret>;
-  clientCheckSecret(options: CheckClientSecretOptions): Promise<CheckResult>;
+  applicationFindById(options: FindApplicationByIdOptions): Promise<Application>;
+  applicationCreate(options: CreateApplicationOptions): Promise<ApplicationSecret>;
+  applicationUpdateName(options: UpdateApplicationNameOptions): Promise<void>;
+  applicationUpdateRedirectUri(options: UpdateApplicationRedirectUriOptions): Promise<void>;
+  applicationRegenerateSecret(options: RegenerateApplicationSecretOptions): Promise<ApplicationSecret>;
+  applicationCheckSecret(options: CheckApplicationSecretOptions): Promise<CheckResult>;
 
   userFindById(options: FindUserByIdOptions): Promise<User>;
   userCreate(options: CreateUserOptions): Promise<void>;
@@ -77,44 +77,44 @@ export default interface DatabaseAdapter {
   authorizationCodesRemove(options: RemoveAuthorizationCodeOptions): Promise<void>;
   authorizationCodesSave(options: SaveAuthorizationCodeOptions): Promise<void>;
 
-  accessTokenFind(options: FindAccessTokenOptions): Promise<UserClientToken>;
-  accessTokenFindByIds(options: FindAccessTokenByIdOptions): Promise<UserClientToken>;
-  accessTokenSave(options: SaveAccessTokenOptions): Promise<UserClientToken>;
+  accessTokenFind(options: FindAccessTokenOptions): Promise<ApplicationToken>;
+  accessTokenFindByIds(options: FindAccessTokenByIdOptions): Promise<ApplicationToken>;
+  accessTokenSave(options: SaveAccessTokenOptions): Promise<ApplicationToken>;
   accessTokenRemoveByIds(options: RemoveAccessTokenByIdsOptions): Promise<void>;
 
-  refreshTokenFind(options: FindRefreshTokenOptions): Promise<UserClientToken>;
-  refreshTokenFindByIds(options: FindRefreshTokenByIdOptions): Promise<UserClientToken>;
-  refreshTokenSave(options: SaveRefreshTokenOptions): Promise<UserClientToken>;
+  refreshTokenFind(options: FindRefreshTokenOptions): Promise<ApplicationToken>;
+  refreshTokenFindByIds(options: FindRefreshTokenByIdOptions): Promise<ApplicationToken>;
+  refreshTokenSave(options: SaveRefreshTokenOptions): Promise<ApplicationToken>;
   refreshTokenRemoveByIds(options: RemoveRefreshTokenByIdsOptions): Promise<void>;
 }
 
-export type FindClientByIdOptions = {
-  clientId: string;
+export type FindApplicationByIdOptions = {
+  applicationId: string;
 };
 
-export type CreateClientOptions = {
+export type CreateApplicationOptions = {
   id: string;
   name: string;
   redirectUri: string;
   owner: string;
 };
 
-export type UpdateClientNameOptions = {
-  clientId: string;
+export type UpdateApplicationNameOptions = {
+  applicationId: string;
   name: string;
 };
 
-export type UpdateClientRedirectUriOptions = {
-  clientId: string;
+export type UpdateApplicationRedirectUriOptions = {
+  applicationId: string;
   redirectUri: URL;
 };
 
-export type RegenerateClientSecretOptions = {
-  clientId: string;
+export type RegenerateApplicationSecretOptions = {
+  applicationId: string;
 };
 
-export type CheckClientSecretOptions = {
-  clientId: string;
+export type CheckApplicationSecretOptions = {
+  applicationId: string;
   secret: string;
 };
 
@@ -160,7 +160,7 @@ export type RemoveAuthorizationCodeOptions = {
 
 export type SaveAuthorizationCodeOptions = {
   code: string;
-  clientId: string;
+  applicationId: string;
   redirectUri: string;
   uid: string;
 };
@@ -171,18 +171,18 @@ export type FindAccessTokenOptions = {
 
 export type FindAccessTokenByIdOptions = {
   uid: string;
-  clientId: string;
+  applicationId: string;
 };
 
 export type SaveAccessTokenOptions = {
   token: string;
   uid: string;
-  clientId: string;
+  applicationId: string;
 };
 
 export type RemoveAccessTokenByIdsOptions = {
   uid: string;
-  clientId: string;
+  applicationId: string;
 };
 
 export type FindRefreshTokenOptions = {
@@ -191,16 +191,16 @@ export type FindRefreshTokenOptions = {
 
 export type FindRefreshTokenByIdOptions = {
   uid: string;
-  clientId: string;
+  applicationId: string;
 };
 
 export type SaveRefreshTokenOptions = {
   token: string;
   uid: string;
-  clientId: string;
+  applicationId: string;
 };
 
 export type RemoveRefreshTokenByIdsOptions = {
   uid: string;
-  clientId: string;
+  applicationId: string;
 };

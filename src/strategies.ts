@@ -1,4 +1,4 @@
-import { Client, User } from "database/database-adapter";
+import { Application, User } from "database/database-adapter";
 import { Request } from "express";
 import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
 import passport from "passport";
@@ -25,21 +25,21 @@ passport.deserializeUser(async (uid: string, done) => {
   }
 });
 
-async function verifyClient(clientId: string, clientSecret: string, done: (error: Error | null, client?: Client) => void) {
+async function verifyApplication(applicationId: string, applicationSecret: string, done: (error: Error | null, application?: Application) => void) {
   try {
-    const client = await database.clientFindById({ clientId: clientId });
-    if (!client) return done(null);
-    const successful = await database.clientCheckSecret({ clientId: clientId, secret: clientSecret });
+    const application = await database.applicationFindById({ applicationId: applicationId });
+    if (!application) return done(null);
+    const successful = await database.applicationCheckSecret({ applicationId: applicationId, secret: applicationSecret });
     if (!successful) return done(null);
-    return done(null, client);
+    return done(null, application);
   } catch (error) {
     done(error as Error);
   }
 }
 
-passport.use(new BasicStrategy(verifyClient));
+passport.use(new BasicStrategy(verifyApplication));
 
-passport.use(new ClientPasswordStrategy(verifyClient));
+passport.use(new ClientPasswordStrategy(verifyApplication));
 
 passport.use(
   new BearerStrategy(async (accessToken, done) => {

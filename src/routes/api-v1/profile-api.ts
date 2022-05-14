@@ -36,7 +36,7 @@ router.post("/", async (req, res) => {
     scopes: profile.scopes,
     private: profile.private,
     providers: providers,
-    clients: profile.clients,
+    applications: profile.applications,
     creationDate: profile.creationDate
   };
   res.json(response);

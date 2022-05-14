@@ -15,7 +15,7 @@ router.post("/profile", async (req, res) => {
     avatar: profile.avatar,
     scopes: profile.scopes,
     private: profile.private,
-    clients: profile.clients,
+    applications: profile.applications,
     creationDate: profile.creationDate
   };
   res.json(response);
