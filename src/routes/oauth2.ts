@@ -10,7 +10,7 @@ const router: Router = express.Router();
 
 router.get(
   "/authorize",
-  ensureLoggedIn("/redirect/login"),
+  ensureLoggedIn("/login"),
   csrfMiddleware,
   server.authorization(
     async (applicationId, redirectUri, done) => {
