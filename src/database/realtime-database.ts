@@ -152,7 +152,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     const reference = (
       await this.tokens.child(options.uid).child("accessTokens").orderByChild("applicationId").equalTo(options.applicationId).get()
     ).val();
-    return (await this.accessTokens.child(reference.token).get()).val();
+    return reference ? (await this.accessTokens.child(reference.token).get()).val() : undefined;
   }
   async accessTokenSave(options: SaveAccessTokenOptions): Promise<ApplicationToken> {
     const accessToken: ApplicationToken = {
@@ -180,7 +180,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     const reference = (
       await this.tokens.child(options.uid).child("refreshTokens").orderByChild("applicationId").equalTo(options.applicationId).get()
     ).val();
-    return (await this.refreshTokens.child(reference.token).get()).val();
+    return reference ? (await this.refreshTokens.child(reference.token).get()).val() : undefined;
   }
   async refreshTokenSave(options: SaveRefreshTokenOptions): Promise<ApplicationToken> {
     const refreshToken: ApplicationToken = {
