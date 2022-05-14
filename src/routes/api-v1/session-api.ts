@@ -26,6 +26,7 @@ router.post("/", async (req, res) => {
       .status(204)
       .end();
   } catch (error) {
+    console.error(error);
     res.sendStatus(403);
   }
 });
@@ -40,6 +41,7 @@ router.delete("/", async (req, res) => {
     }
     res.sendStatus(204);
   } catch (error) {
+    console.error(error);
     res.sendStatus(500);
   }
 });

@@ -47,6 +47,7 @@ router.patch("/", async (req, res) => {
       uid: profile.uid,
       private: req.body.private
     });
+    res.sendStatus(204);
   } catch (error) {
     res.sendStatus(500);
   }

@@ -114,7 +114,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
   }
   async userPatch(options: PatchUserOptiopns): Promise<void> {
     if (options.private !== undefined) {
-      await this.profiles.child(options.uid).child("private").update(options.private);
+      await this.profiles.child(options.uid).child("private").set(options.private);
     }
   }
   async userProviderProfileUpdateOrCreate(options: UpdateOrCreateProviderProfileOptions): Promise<ProviderProfile> {
