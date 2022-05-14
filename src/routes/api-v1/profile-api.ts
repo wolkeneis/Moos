@@ -19,16 +19,17 @@ router.post("/", async (req, res) => {
           provider: provider,
           providerId: providerId
         });
-        providers.push({
+        const providerProfile: v1.components["schemas"]["ProviderProfile"] = {
           provider: fetchedProfile.provider,
           providerId: fetchedProfile.providerId,
           username: fetchedProfile.username,
           avatar: fetchedProfile.avatar
-        } as v1.components["schemas"]["ProviderProfile"]);
+        };
+        providers.push(providerProfile);
       }
     }
   }
-  res.json({
+  const response: v1.components["schemas"]["UserProfile"] = {
     uid: profile.uid,
     username: profile.username,
     avatar: profile.avatar,
@@ -37,7 +38,8 @@ router.post("/", async (req, res) => {
     providers: providers,
     clients: profile.clients,
     creationDate: profile.creationDate
-  } as v1.components["schemas"]["UserProfile"]);
+  };
+  res.json(response);
 });
 
 router.patch("/", async (req, res) => {
