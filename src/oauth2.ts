@@ -16,7 +16,7 @@ server.deserializeClient(async (applicationId: string, done: DeserializeClientDo
     const application = await database.applicationFindById({ applicationId: applicationId });
     return done(null, application);
   } catch (error) {
-    done(error as Error);
+    return done(error as Error);
   }
 });
 
@@ -26,13 +26,18 @@ type Tokens = {
 };
 
 async function issueTokens(applicationId: string, uid: string): Promise<Tokens> {
-  const user = await database.userFindById({ uid: uid });
-  if (!user) throw new Error("User not found");
-  await database.accessTokenRemoveByIds({ uid: user.uid, applicationId: applicationId });
-  await database.refreshTokenRemoveByIds({ uid: user.uid, applicationId: applicationId });
-  const accessToken = await database.accessTokenSave({ token: randomToken(256), uid: user.uid, applicationId: applicationId });
-  const refreshToken = await database.refreshTokenSave({ token: randomToken(256), uid: user.uid, applicationId: applicationId });
-  return { accessToken: accessToken, refreshToken: refreshToken };
+  try {
+    const user = await database.userFindById({ uid: uid });
+    if (!user) throw new Error("User not found");
+    await database.accessTokenRemoveByIds({ uid: user.uid, applicationId: applicationId });
+    await database.refreshTokenRemoveByIds({ uid: user.uid, applicationId: applicationId });
+    const accessToken = await database.accessTokenSave({ token: randomToken(256), uid: user.uid, applicationId: applicationId });
+    const refreshToken = await database.refreshTokenSave({ token: randomToken(256), uid: user.uid, applicationId: applicationId });
+    return { accessToken: accessToken, refreshToken: refreshToken };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 server.grant(
@@ -45,9 +50,9 @@ server.grant(
         redirectUri: redirectUri,
         uid: user.uid
       });
-      done(null, code);
+      return done(null, code);
     } catch (error) {
-      done(error as Error);
+      return done(error as Error);
     }
   })
 );
@@ -56,9 +61,9 @@ server.grant(
   oauth2orize.grant.token(async (application: Application, user: User, done) => {
     try {
       const tokens = await issueTokens(application.id, user.uid);
-      done(null, tokens.accessToken.token, tokens.refreshToken.token);
+      return done(null, tokens.accessToken.token, tokens.refreshToken.token);
     } catch (error) {
-      done(error as Error);
+      return done(error as Error);
     }
   })
 );
@@ -78,12 +83,12 @@ server.exchange(
         } catch (error) {
           console.error(error);
         }
-        done(new Error("Authorization Code expired"));
+        return done(new Error("Authorization Code expired"));
       }
       const tokens = await issueTokens(application.id, authorizationCode.uid);
-      done(null, tokens.accessToken.token, tokens.refreshToken.token);
+      return done(null, tokens.accessToken.token, tokens.refreshToken.token);
     } catch (error) {
-      done(error as Error);
+      return done(error as Error);
     }
   })
 );
@@ -95,9 +100,9 @@ server.exchange(
       if (!refreshToken) return done(new Error("Refresh Token not found"));
       if (application.id !== refreshToken.applicationId) return done(new Error("Original Token Receiver is not the supplied Application"));
       const tokens = await issueTokens(refreshToken.applicationId, refreshToken.uid);
-      done(null, tokens.accessToken.token, tokens.refreshToken.token);
+      return done(null, tokens.accessToken.token, tokens.refreshToken.token);
     } catch (error) {
-      done(error as Error);
+      return done(error as Error);
     }
   })
 );

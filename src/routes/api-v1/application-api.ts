@@ -7,7 +7,7 @@ const router: Router = express.Router();
 
 router.use(passport.authenticate("bearer", { session: false }));
 
-router.post("/profile", async (req, res) => {
+router.get("/profile", async (req, res) => {
   const profile = req.user as User;
   const response: v1.components["schemas"]["UserProfile"] = {
     uid: profile.uid,
@@ -18,7 +18,7 @@ router.post("/profile", async (req, res) => {
     applications: profile.applications,
     creationDate: profile.creationDate
   };
-  res.json(response);
+  return res.json(response);
 });
 
 export default router;

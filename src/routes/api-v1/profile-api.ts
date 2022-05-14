@@ -39,7 +39,7 @@ router.post("/", async (req, res) => {
     applications: profile.applications,
     creationDate: profile.creationDate
   };
-  res.json(response);
+  return res.json(response);
 });
 
 router.patch("/", async (req, res) => {
@@ -50,9 +50,9 @@ router.patch("/", async (req, res) => {
       uid: profile.uid,
       private: body.private
     });
-    res.sendStatus(204);
+    return res.sendStatus(204);
   } catch (error) {
-    res.sendStatus(500);
+    return res.sendStatus(500);
   }
 });
 

@@ -25,12 +25,12 @@ router.get(
     }
     try {
       const token = await createToken((req.user as { uid: string }).uid);
-      res.redirect(
+      return res.redirect(
         `${envRequire("CONTROL_ORIGIN")}/redirect/session?token=${encodeURIComponent(token)}&_csrf=${encodeURIComponent(req.csrfToken())}`
       );
     } catch (error) {
       console.error(error);
-      res.sendStatus(500);
+      return res.sendStatus(500);
     }
   }
 );
@@ -47,12 +47,12 @@ router.get(
     }
     try {
       const token = await createToken((req.user as { uid: string }).uid);
-      res.redirect(
+      return res.redirect(
         `${envRequire("CONTROL_ORIGIN")}/redirect/session?token=${encodeURIComponent(token)}&_csrf=${encodeURIComponent(req.csrfToken())}`
       );
     } catch (error) {
       console.error(error);
-      res.sendStatus(500);
+      return res.sendStatus(500);
     }
   }
 );

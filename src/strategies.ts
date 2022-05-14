@@ -46,7 +46,7 @@ passport.use(
     try {
       const token = await database.accessTokenFind({ accessToken: accessToken });
       if (!token) return done(null);
-      if (token.creationDate + 1000 * 60 * 60) return done(new Error("Access Token expired"));
+      if (token.creationDate + 1000 * 60 * 60 < Date.now()) return done(new Error("Access Token expired"));
       const user = await database.userFindById({ uid: token.uid });
       if (!user) return done(null);
       done(null, user, { scope: ["*"] });

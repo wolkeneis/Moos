@@ -6,7 +6,7 @@ const router: Router = express.Router();
 router.use(csrfMiddleware);
 
 router.get("/", async (req, res) => {
-  res.json({
+  return res.json({
     _csrf: req.csrfToken()
   });
 });

@@ -149,9 +149,10 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     return (await this.accessTokens.child(options.accessToken).get()).val();
   }
   async accessTokenFindByIds(options: FindAccessTokenByIdOptions): Promise<ApplicationToken> {
-    const reference = (
+    const references = (
       await this.tokens.child(options.uid).child("accessTokens").orderByChild("applicationId").equalTo(options.applicationId).get()
     ).val();
+    const reference = references ? references[Object.keys(references)[0]] : undefined;
     return reference ? (await this.accessTokens.child(reference.token).get()).val() : undefined;
   }
   async accessTokenSave(options: SaveAccessTokenOptions): Promise<ApplicationToken> {
@@ -169,17 +170,20 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
   }
   async accessTokenRemoveByIds(options: RemoveAccessTokenByIdsOptions): Promise<void> {
     const accessToken = await this.accessTokenFindByIds({ uid: options.uid, applicationId: options.applicationId });
-    await this.accessTokens.child(accessToken.token).remove();
-    await this.tokens.child(accessToken.uid).child("accessTokens").child(accessToken.token).remove();
+    if (accessToken) {
+      await this.accessTokens.child(accessToken.token).remove();
+      await this.tokens.child(accessToken.uid).child("accessTokens").child(accessToken.token).remove();
+    }
   }
 
   async refreshTokenFind(options: FindRefreshTokenOptions): Promise<ApplicationToken> {
     return (await this.refreshTokens.child(options.refreshToken).get()).val();
   }
   async refreshTokenFindByIds(options: FindRefreshTokenByIdOptions): Promise<ApplicationToken> {
-    const reference = (
+    const references = (
       await this.tokens.child(options.uid).child("refreshTokens").orderByChild("applicationId").equalTo(options.applicationId).get()
     ).val();
+    const reference = references ? references[Object.keys(references)[0]] : undefined;
     return reference ? (await this.refreshTokens.child(reference.token).get()).val() : undefined;
   }
   async refreshTokenSave(options: SaveRefreshTokenOptions): Promise<ApplicationToken> {
@@ -197,7 +201,9 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
   }
   async refreshTokenRemoveByIds(options: RemoveRefreshTokenByIdsOptions): Promise<void> {
     const refreshToken = await this.refreshTokenFindByIds({ uid: options.uid, applicationId: options.applicationId });
-    await this.refreshTokens.child(refreshToken.token).remove();
-    await this.tokens.child(refreshToken.uid).child("refreshTokens").child(refreshToken.token).remove();
+    if (refreshToken) {
+      await this.refreshTokens.child(refreshToken.token).remove();
+      await this.tokens.child(refreshToken.uid).child("refreshTokens").child(refreshToken.token).remove();
+    }
   }
 }

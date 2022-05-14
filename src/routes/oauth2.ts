@@ -3,10 +3,12 @@ import express, { Router } from "express";
 import passport from "passport";
 import database from "../database";
 import { envRequire } from "../environment";
-import { csrfMiddleware, ensureLoggedIn } from "../middleware";
+import { csrfMiddleware, ensureLoggedIn, sessionMiddleware } from "../middleware";
 import server from "../oauth2";
 
 const router: Router = express.Router();
+
+router.use(sessionMiddleware);
 
 router.get(
   "/authorize",
@@ -23,7 +25,7 @@ router.get(
           return done(new Error("Redirect URIs do not match"));
         }
       } catch (error) {
-        done(error as Error);
+        return done(error as Error);
       }
     },
     async (application: Application, user: User, scope, type, areq, done) => {
@@ -33,7 +35,7 @@ router.get(
         if (token) return done(null, true, null, null);
         return done(null, false, null, null);
       } catch (error) {
-        done(error as Error, false, null, null);
+        return done(error as Error, false, null, null);
       }
     }
   ),

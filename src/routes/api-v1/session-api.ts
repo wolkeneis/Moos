@@ -17,7 +17,7 @@ router.post("/", async (req, res) => {
   }
   try {
     const cookie = await createCookie(token);
-    res
+    return res
       .cookie("session", cookie, {
         path: "/",
         sameSite: "none",
@@ -29,7 +29,7 @@ router.post("/", async (req, res) => {
       .end();
   } catch (error) {
     console.error(error);
-    res.sendStatus(403);
+    return res.sendStatus(403);
   }
 });
 
@@ -39,12 +39,12 @@ router.delete("/", async (req, res) => {
   try {
     const decodedClaims = await verifyCookie(sessionCookie);
     if (decodedClaims) {
-      auth.revokeRefreshTokens(decodedClaims.sub);
+      await auth.revokeRefreshTokens(decodedClaims.sub);
     }
-    res.sendStatus(204);
+    return res.sendStatus(204);
   } catch (error) {
     console.error(error);
-    res.sendStatus(500);
+    return res.sendStatus(500);
   }
 });
 
