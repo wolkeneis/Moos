@@ -42,10 +42,11 @@ router.post("/", async (req, res) => {
 
 router.patch("/", async (req, res) => {
   const profile = req.user as User;
+  const body: v1.operations["patch-profile"]["requestBody"]["content"]["application/json"] = req.body;
   try {
     await database.userPatch({
       uid: profile.uid,
-      private: req.body.private
+      private: body.private
     });
     res.sendStatus(204);
   } catch (error) {
