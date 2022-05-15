@@ -33,6 +33,7 @@ export default class FirestoreStore extends Store {
           if (!data) {
             throw new Error("A database error occurred.");
           }
+
           const result = JSON.parse(data.data);
           return callback(null, result);
         } catch (error) {

@@ -2,7 +2,15 @@ export type ApplicationSecret = string;
 
 export type CheckResult = boolean;
 
-export type AuthProvider = "discord" | "google";
+export const enum AuthProvider {
+  discord = "discord",
+  google = "google"
+}
+
+export enum AuthScope {
+  identify = "identify",
+  all = "*"
+}
 
 export interface User {
   uid: string;
@@ -45,6 +53,7 @@ export type AuthorizationCode = {
   redirectUri: string;
   uid: string;
   creationDate: number;
+  scope: AuthScope[];
 };
 
 export type ApplicationToken = {
@@ -52,6 +61,7 @@ export type ApplicationToken = {
   uid: string;
   applicationId: string;
   creationDate: number;
+  scope: AuthScope[];
 };
 
 export type TokenReference = {
@@ -163,6 +173,7 @@ export type SaveAuthorizationCodeOptions = {
   applicationId: string;
   redirectUri: string;
   uid: string;
+  scope: AuthScope[];
 };
 
 export type FindAccessTokenOptions = {
@@ -178,6 +189,7 @@ export type SaveAccessTokenOptions = {
   token: string;
   uid: string;
   applicationId: string;
+  scope: AuthScope[];
 };
 
 export type RemoveAccessTokenByIdsOptions = {
@@ -198,6 +210,7 @@ export type SaveRefreshTokenOptions = {
   token: string;
   uid: string;
   applicationId: string;
+  scope: AuthScope[];
 };
 
 export type RemoveRefreshTokenByIdsOptions = {

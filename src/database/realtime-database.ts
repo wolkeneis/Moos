@@ -53,9 +53,9 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     this.applications = database.ref("applications");
     this.profiles = database.ref("profiles");
     this.providers = database.ref("providers");
-    this.authorizationCodes = database.ref("authorizationCodes");
-    this.accessTokens = database.ref("accessTokens");
-    this.refreshTokens = database.ref("refreshTokens");
+    this.authorizationCodes = database.ref("tokens/authorizationCodes");
+    this.accessTokens = database.ref("tokens/accessTokens");
+    this.refreshTokens = database.ref("tokens/refreshTokens");
     this.tokens = database.ref("tokens");
   }
   async applicationFindById(options: FindApplicationByIdOptions): Promise<Application> {

@@ -1,4 +1,4 @@
-import { Application, User } from "database/database-adapter";
+import { Application, AuthProvider, User } from "./database/database-adapter";
 import { Request } from "express";
 import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
 import passport from "passport";
@@ -84,7 +84,7 @@ passport.use(
           }
         }
         const user = await database.userProviderProfileUpdateOrCreate({
-          provider: "discord",
+          provider: AuthProvider.discord,
           uid: uid,
           providerId: profile.id,
           username: username,
@@ -128,7 +128,7 @@ passport.use(
           }
         }
         const user = await database.userProviderProfileUpdateOrCreate({
-          provider: "google",
+          provider: AuthProvider.google,
           uid: uid,
           providerId: profile.id,
           username: username,

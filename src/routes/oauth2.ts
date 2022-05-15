@@ -1,4 +1,4 @@
-import { Application, User } from "database/database-adapter";
+import { Application, AuthScope, User } from "../database/database-adapter";
 import express, { Router } from "express";
 import passport from "passport";
 import database from "../database";
@@ -28,12 +28,17 @@ router.get(
         return done(error as Error);
       }
     },
-    async (application: Application, user: User, scope, type, areq, done) => {
-      if (application.trusted) return done(null, true, null, null);
+    async (application: Application, user: User, scopes, _type, _areq, done) => {
+      for (const scope of scopes) {
+        if (!(scope in AuthScope)) {
+          return done(new Error(`Invalid scope: ${scope}`), false, null, null);
+        }
+      }
+      if (application.trusted) return done(null, true, { scope: scopes }, null);
       try {
         const token = await database.accessTokenFindByIds({ applicationId: application.id, uid: user.uid });
-        if (token) return done(null, true, null, null);
-        return done(null, false, null, null);
+        if (token) return done(null, true, { scope: token.scope }, null);
+        return done(null, false, { scope: scopes }, null);
       } catch (error) {
         return done(error as Error, false, null, null);
       }
@@ -43,9 +48,9 @@ router.get(
     if (!req.oauth2) return res.sendStatus(500);
     res.redirect(
       envRequire("CONTROL_ORIGIN") +
-        `/redirect/authorize?transactionId=${encodeURIComponent(req.oauth2.transactionID)}&username=${encodeURIComponent(
-          req.oauth2.user.username
-        )}&application=${encodeURIComponent(req.oauth2.client.name)}&_csrf=${encodeURIComponent(req.csrfToken())}`
+        `/redirect/authorize?transactionId=${encodeURIComponent(req.oauth2.transactionID)}&redirectUri=${encodeURIComponent(
+          req.oauth2.redirectURI
+        )}&application=${encodeURIComponent(req.oauth2.client.name)}&scope=${req.oauth2.info.scope}&_csrf=${encodeURIComponent(req.csrfToken())}`
     );
   }
 );
