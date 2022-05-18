@@ -1,31 +1,18 @@
+import { CodeExchange, CodeGrant, OAuth2Server, OAuth2Tokens, OAuth2Transaction } from "@wolkeneis/oauth2-server";
 import crypto from "crypto";
-import { Application, ApplicationToken, AuthScope, User } from "database/database-adapter";
-import oauth2orize, { DeserializeClientDoneFunction } from "oauth2orize";
 import database from "./database";
+import { Application, AuthScope, User } from "./database/database-adapter";
 
-const server = oauth2orize.createServer();
+const server: OAuth2Server = new OAuth2Server(
+  async (application: unknown) => (application as Application).id,
+  async (applicationId: string) => await database.applicationFindById({ applicationId: applicationId })
+);
 
 function randomToken(length: number) {
   return crypto.randomBytes(length).toString("hex");
 }
 
-server.serializeClient((application: Application, done) => done(null, application.id));
-
-server.deserializeClient(async (applicationId: string, done: DeserializeClientDoneFunction) => {
-  try {
-    const application = await database.applicationFindById({ applicationId: applicationId });
-    return done(null, application);
-  } catch (error) {
-    return done(error as Error);
-  }
-});
-
-type Tokens = {
-  accessToken: ApplicationToken;
-  refreshToken: ApplicationToken;
-};
-
-async function issueTokens(applicationId: string, uid: string, scope: AuthScope[]): Promise<Tokens> {
+async function issueTokens(applicationId: string, uid: string, scope: AuthScope[]): Promise<OAuth2Tokens> {
   try {
     const user = await database.userFindById({ uid: uid });
     if (!user) throw new Error("User not found");
@@ -33,81 +20,68 @@ async function issueTokens(applicationId: string, uid: string, scope: AuthScope[
     await database.refreshTokenRemoveByIds({ uid: user.uid, applicationId: applicationId });
     const accessToken = await database.accessTokenSave({ token: randomToken(256), uid: user.uid, applicationId: applicationId, scope: scope });
     const refreshToken = await database.refreshTokenSave({ token: randomToken(256), uid: user.uid, applicationId: applicationId, scope: scope });
-    return { accessToken: accessToken, refreshToken: refreshToken };
+    const tokens: OAuth2Tokens = {
+      accessToken: accessToken.token,
+      refreshToken: refreshToken.token,
+      tokenType: "Bearer"
+    };
+    return tokens;
   } catch (error) {
     console.error(error);
     throw error;
   }
 }
 
-server.grant(
-  oauth2orize.grant.code(
-    async (application: Application, redirectUri: string, user: User, res: any, req: any, done: (err: Error | null, code?: string) => void) => {
-      try {
-        const code: string = randomToken(256);
-        await database.authorizationCodesSave({
-          code: code,
-          applicationId: application.id,
-          redirectUri: redirectUri,
-          uid: user.uid,
-          scope: res.scope ?? req.scope
-        });
-        return done(null, code);
-      } catch (error) {
-        return done(error as Error);
-      }
+server.addGrant(
+  new CodeGrant(async (transaction: OAuth2Transaction<Application, User, any>): Promise<string> => {
+    const code: string = randomToken(256);
+    const scope = parseAuthScope(transaction.info?.scope);
+    if (!scope || !scope.length) {
+      throw new Error(`Invalid scope: ${transaction.info?.scope}`);
     }
-  )
-);
-
-server.grant(
-  oauth2orize.grant.token(async (application: Application, user: User, ares, done) => {
-    try {
-      const tokens = await issueTokens(application.id, user.uid, ares.scope);
-      return done(null, tokens.accessToken.token, tokens.refreshToken.token);
-    } catch (error) {
-      return done(error as Error);
-    }
+    await database.authorizationCodesSave({
+      code: code,
+      applicationId: transaction.client.id,
+      redirectUri: transaction.client.redirectUri,
+      uid: transaction.user.uid,
+      scope: scope
+    });
+    return code;
   })
 );
 
-server.exchange(
-  oauth2orize.exchange.code(async (application: Application, code, redirectUri, done) => {
+server.addExchange(
+  new CodeExchange(async (application: Application, code, redirectUri): Promise<OAuth2Tokens> => {
+    const authorizationCode = await database.authorizationCodesFind({ authorizationCode: code });
+    if (!authorizationCode) return null;
     try {
-      const authorizationCode = await database.authorizationCodesFind({ authorizationCode: code });
-      if (!authorizationCode) return done(new Error("Authorization Code not found"));
-      try {
-        await database.authorizationCodesRemove({
-          authorizationCode: authorizationCode.code
-        });
-      } catch (error) {
-        console.error(error);
-      }
-      if (application.id !== authorizationCode.applicationId) return done(null, false);
-      if (redirectUri !== authorizationCode.redirectUri) return done(null, false);
-      if (authorizationCode.creationDate + 1000 * 60 * 2 < Date.now()) {
-        return done(new Error("Authorization Code expired"));
-      }
-      const tokens = await issueTokens(application.id, authorizationCode.uid, authorizationCode.scope);
-      return done(null, tokens.accessToken.token, tokens.refreshToken.token);
+      await database.authorizationCodesRemove({
+        authorizationCode: authorizationCode.code
+      });
     } catch (error) {
-      return done(error as Error);
+      console.error(error);
     }
+    if (application.id !== authorizationCode.applicationId) throw new Error("Application identifiers do not match.");
+    if (redirectUri !== authorizationCode.redirectUri) return null;
+    if (authorizationCode.creationDate + 1000 * 60 * 2 < Date.now()) {
+      throw new Error("Authorization code expired");
+    }
+    return await issueTokens(application.id, authorizationCode.uid, authorizationCode.scope);
   })
 );
 
-server.exchange(
-  oauth2orize.exchange.refreshToken(async (application: Application, token, scope, done) => {
-    try {
-      const refreshToken = await database.refreshTokenFind({ refreshToken: token });
-      if (!refreshToken) return done(new Error("Refresh Token not found"));
-      if (application.id !== refreshToken.applicationId) return done(new Error("Original Token Receiver is not the supplied Application"));
-      const tokens = await issueTokens(refreshToken.applicationId, refreshToken.uid, scope as AuthScope[]);
-      return done(null, tokens.accessToken.token, tokens.refreshToken.token);
-    } catch (error) {
-      return done(error as Error);
+export function parseAuthScope(authScope?: string[]): AuthScope[] {
+  const scopes: AuthScope[] = [];
+  if (authScope) {
+    for (const scope of authScope) {
+      if (scope in AuthScope) {
+        scopes.push(scope as AuthScope);
+      } else {
+        throw new Error(`Invalid scope: ${scope}`);
+      }
     }
-  })
-);
+  }
+  return scopes;
+}
 
 export default server;
