@@ -23,9 +23,9 @@ router.get(
       return application;
     },
     async (transaction: OAuth2Transaction<Application, User, unknown>): Promise<OAuth2Info> => {
-      const scope = parseAuthScope(transaction.info?.scope);
+      const scope = parseAuthScope(transaction.request.scope);
       if (!scope || !scope.length) {
-        throw new Error(`Invalid scope: ${transaction.info?.scope}`);
+        throw new Error(`Invalid scope: ${transaction.request.scope}`);
       }
       return { allow: transaction.client.trusted, scope: scope };
     }
