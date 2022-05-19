@@ -33,7 +33,7 @@ async function issueTokens(applicationId: string, uid: string, scope: AuthScope[
 }
 
 server.addGrant(
-  new CodeGrant(async (transaction: OAuth2Transaction<Application, User, any>): Promise<string> => {
+  new CodeGrant(async (transaction: OAuth2Transaction<Application, User, unknown>): Promise<string> => {
     const code: string = randomToken(256);
     const scope = parseAuthScope(transaction.info?.scope);
     if (!scope || !scope.length) {
