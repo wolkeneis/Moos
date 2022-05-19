@@ -136,7 +136,7 @@ passport.use(
           accessToken: accessToken,
           refreshToken: refreshToken ? refreshToken : null
         });
-        done(null, { uid: uid });
+        done(null, { uid: user.uid });
       } catch (error) {
         done(error as Error);
       }

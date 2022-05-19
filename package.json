@@ -53,16 +53,17 @@
     "*.{js,ts,css,md,json}": "prettier --write"
   },
   "dependencies": {
+    "@wolkeneis/oauth2-server": "^1.0.0",
     "argon2": "^0.28.5",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "csurf": "^1.11.0",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "express-serve-static-core": "^0.1.1",
     "express-session": "^1.17.3",
     "firebase-admin": "^10.2.0",
     "moos-api": "^0.1.0",
-    "oauth2orize": "^1.11.1",
     "passport": "^0.5.2",
     "passport-discord": "^0.1.4",
     "passport-google-oauth20": "^2.0.0",
