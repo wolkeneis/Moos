@@ -64,7 +64,6 @@
     "express-session": "^1.17.3",
     "firebase-admin": "^10.2.0",
     "moos-api": "^0.1.0",
-    "oauth2orize": "^1.11.1",
     "passport": "^0.5.2",
     "passport-discord": "^0.1.4",
     "passport-google-oauth20": "^2.0.0",

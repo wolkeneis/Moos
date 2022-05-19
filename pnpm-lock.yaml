@@ -31,7 +31,6 @@ specifiers:
   lint-staged: ^12.4.1
   moos-api: ^0.1.0
   nodemon: ^2.0.16
-  oauth2orize: ^1.11.1
   passport: ^0.5.2
   passport-discord: ^0.1.4
   passport-google-oauth20: ^2.0.0
@@ -55,7 +54,6 @@ dependencies:
   express-session: 1.17.3
   firebase-admin: 10.2.0
   moos-api: 0.1.0
-  oauth2orize: 1.11.1
   passport: 0.5.2
   passport-discord: 0.1.4
   passport-google-oauth20: 2.0.0
@@ -2740,17 +2738,6 @@ packages:
 
   /oauth/0.9.15:
     resolution: {integrity: sha1-vR/vr2hslrdUda7VGWQS/2DPucE=}
-    dev: false
-
-  /oauth2orize/1.11.1:
-    resolution: {integrity: sha512-9dSx/Gwm0J2Rvj4RH9+h7iXVnRXZ6biwWRgb2dCeQhCosODS0nYdM9I/G7BUGsjbgn0pHjGcn1zcCRtzj2SlRA==}
-    engines: {node: '>= 0.4.0'}
-    dependencies:
-      debug: 2.6.9
-      uid2: 0.0.4
-      utils-merge: 1.0.1
-    transitivePeerDependencies:
-      - supports-color
     dev: false
 
   /object-assign/4.1.1:
