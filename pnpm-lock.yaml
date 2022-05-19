@@ -25,7 +25,6 @@ specifiers:
   eslint: ^8.15.0
   eslint-config-prettier: ^8.5.0
   express: ^4.18.1
-  express-serve-static-core: ^0.1.1
   express-session: ^1.17.3
   firebase-admin: ^10.2.0
   husky: ^8.0.1
@@ -52,7 +51,6 @@ dependencies:
   csurf: 1.11.0
   dotenv: 16.0.1
   express: 4.18.1
-  express-serve-static-core: 0.1.1
   express-session: 1.17.3
   firebase-admin: 10.2.0
   moos-api: 0.1.0
@@ -1629,10 +1627,6 @@ packages:
       signal-exit: 3.0.7
       strip-final-newline: 2.0.0
     dev: true
-
-  /express-serve-static-core/0.1.1:
-    resolution: { integrity: sha1-IiNYESp5vJ++AIOCMujNLjEy7zc= }
-    dev: false
 
   /express-session/1.17.3:
     resolution: { integrity: sha512-4+otWXlShYlG1Ma+2Jnn+xgKUZTMJ5QD3YvfilX3AcocOAbIkVylSWEklzALe/+Pu4qV6TYBj5GwOBFfdKqLBw== }
