@@ -17,7 +17,8 @@ router.get("/discord", passport.authenticate("discord"));
 router.get(
   "/discord/callback",
   passport.authenticate("discord", {
-    failureRedirect: "/login"
+    failureRedirect: "/login",
+    session: false
   }),
   async (req, res) => {
     if (!req.user) {
@@ -39,7 +40,8 @@ router.get("/google", passport.authenticate("google"));
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "/login"
+    failureRedirect: "/login",
+    session: false
   }),
   async (req, res) => {
     if (!req.user) {
