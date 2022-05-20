@@ -10,7 +10,7 @@ router.use(ensureLoggedIn());
 
 router.post("/", async (req, res) => {
   const profile = req.user as User;
-  const providers: v1.components["schemas"]["ProviderProfile"][] = [];
+  const providers: v1.ProviderProfile[] = [];
   if (profile.providers) {
     for (const provider of Object.keys(profile.providers)) {
       const providerId = profile.providers[provider as AuthProvider];
@@ -19,7 +19,7 @@ router.post("/", async (req, res) => {
           provider: provider,
           providerId: providerId
         });
-        const providerProfile: v1.components["schemas"]["ProviderProfile"] = {
+        const providerProfile: v1.ProviderProfile = {
           provider: fetchedProfile.provider,
           providerId: fetchedProfile.providerId,
           username: fetchedProfile.username,
@@ -29,7 +29,7 @@ router.post("/", async (req, res) => {
       }
     }
   }
-  const response: v1.components["schemas"]["UserProfile"] = {
+  const response: v1.UserProfile = {
     uid: profile.uid,
     username: profile.username,
     avatar: profile.avatar,

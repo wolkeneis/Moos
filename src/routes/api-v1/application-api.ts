@@ -9,7 +9,7 @@ router.use(passport.authenticate("bearer", { session: false }));
 
 router.get("/profile", async (req, res) => {
   const profile = req.user as User;
-  const response: v1.components["schemas"]["UserProfile"] = {
+  const response: v1.UserProfile = {
     uid: profile.uid,
     username: profile.username,
     avatar: profile.avatar,
