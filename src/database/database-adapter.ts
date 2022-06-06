@@ -9,10 +9,11 @@ export const enum AuthProvider {
 
 export enum AuthScope {
   identify = "identify",
-  all = "*"
+  all = "*",
+  files = "files"
 }
 
-export interface User {
+export type User = {
   uid: string;
   username: string;
   avatar: string | null;
@@ -20,8 +21,9 @@ export interface User {
   private: boolean;
   providers?: ProviderReferences;
   applications: Array<string>;
+  files: Array<string>;
   creationDate: number;
-}
+};
 
 export type ProviderReferences = {
   [key in AuthProvider]?: string;
@@ -37,7 +39,7 @@ export type ProviderProfile = {
   refreshToken: string | null;
 };
 
-export interface Application {
+export type Application = {
   id: string;
   name: string;
   redirectUri: string;
@@ -45,7 +47,15 @@ export interface Application {
   secret: string;
   trusted: boolean;
   creationDate: number;
-}
+};
+
+export type File = {
+  id: string;
+  name: string;
+  owner: string;
+  private: boolean;
+  creationDate: number;
+};
 
 export type AuthorizationCode = {
   code: string;
@@ -82,6 +92,11 @@ export default interface DatabaseAdapter {
   userPatch(options: PatchUserOptiopns): Promise<void>;
   userProviderProfileUpdateOrCreate(options: UpdateOrCreateProviderProfileOptions): Promise<ProviderProfile>;
   userProviderProfileFindById(options: FindProviderProfileByIdOptions): Promise<ProviderProfile>;
+
+  fileFind(options: FindFileByIdOptions): Promise<File>;
+  fileCreate(options: CreateFileOptions): Promise<void>;
+  filePatch(options: PatchFileOptiopns): Promise<void>;
+  fileDelete(options: DeleteFileOptions): Promise<void>;
 
   authorizationCodesFind(options: FindAuthorizationCodeOptions): Promise<AuthorizationCode>;
   authorizationCodesRemove(options: RemoveAuthorizationCodeOptions): Promise<void>;
@@ -126,6 +141,27 @@ export type RegenerateApplicationSecretOptions = {
 export type CheckApplicationSecretOptions = {
   applicationId: string;
   secret: string;
+};
+
+export type FindFileByIdOptions = {
+  fileId: string;
+};
+
+export type CreateFileOptions = {
+  id: string;
+  name: string;
+  owner: string;
+  private?: boolean;
+};
+
+export type PatchFileOptiopns = {
+  fileId: string;
+  name?: string;
+  private?: boolean;
+};
+
+export type DeleteFileOptions = {
+  fileId: string;
 };
 
 export type FindUserByIdOptions = {

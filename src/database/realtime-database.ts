@@ -8,15 +8,20 @@ import DatabaseAdapter, {
   AuthorizationCode,
   CheckApplicationSecretOptions,
   CreateApplicationOptions,
+  CreateFileOptions,
   CreateUserOptions,
+  DeleteFileOptions,
+  File,
   FindAccessTokenByIdOptions,
   FindAccessTokenOptions,
   FindApplicationByIdOptions,
   FindAuthorizationCodeOptions,
+  FindFileByIdOptions,
   FindProviderProfileByIdOptions,
   FindRefreshTokenByIdOptions,
   FindRefreshTokenOptions,
   FindUserByIdOptions,
+  PatchFileOptiopns,
   PatchUserOptiopns,
   ProviderProfile,
   ProviderReferences,
@@ -43,6 +48,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
   applications: Reference;
   profiles: Reference;
   providers: Reference;
+  files: Reference;
   authorizationCodes: Reference;
   accessTokens: Reference;
   refreshTokens: Reference;
@@ -53,6 +59,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     this.applications = database.ref("applications");
     this.profiles = database.ref("profiles");
     this.providers = database.ref("providers");
+    this.files = database.ref("files");
     this.authorizationCodes = database.ref("tokens/authorizationCodes");
     this.accessTokens = database.ref("tokens/accessTokens");
     this.refreshTokens = database.ref("tokens/refreshTokens");
@@ -108,6 +115,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     const user: User = {
       ...options,
       applications: [],
+      files: [],
       creationDate: Date.now()
     };
     await this.profiles.child(user.uid).set(user);
@@ -129,6 +137,34 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
   }
   async userProviderProfileFindById(options: FindProviderProfileByIdOptions): Promise<ProviderProfile> {
     return (await this.providers.child(options.provider).child(options.providerId).get()).val();
+  }
+
+  async fileFind(options: FindFileByIdOptions): Promise<File> {
+    return (await this.files.child(options.fileId).get()).val();
+  }
+  async fileCreate(options: CreateFileOptions): Promise<void> {
+    const file: File = {
+      ...options,
+      private: options.private ?? true,
+      creationDate: Date.now()
+    };
+    await this.files.child(options.id).set(file);
+    const files = ((await this.userFindById({ uid: options.owner })).files ?? []).concat(file.id);
+    await this.profiles.child(options.owner).child("files").update(files);
+  }
+  async filePatch(options: PatchFileOptiopns): Promise<void> {
+    if (options.name !== undefined) {
+      await this.files.child(options.fileId).child("name").set(options.name);
+    } else if (options.private !== undefined) {
+      await this.files.child(options.fileId).child("private").set(options.private);
+    }
+  }
+  async fileDelete(options: DeleteFileOptions): Promise<void> {
+    const file = await this.fileFind({ fileId: options.fileId });
+    await this.files.child(file.id).remove();
+    const profile = await this.userFindById({ uid: file.owner });
+    profile.files.filter((fileId) => fileId !== file.id);
+    await this.profiles.child(file.owner).child("files").update(profile.files);
   }
 
   async authorizationCodesFind(options: FindAuthorizationCodeOptions): Promise<AuthorizationCode> {

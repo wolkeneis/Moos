@@ -3,6 +3,10 @@ import express, { Router } from "express";
 import { v1 } from "moos-api";
 import database from "../../database";
 import { csrfMiddleware, ensureLoggedIn } from "../../middleware";
+import "../../files";
+import { signDownloadUrl, signUploadUrl } from "../../files";
+import { v4 as uuidv4 } from "uuid";
+
 const router: Router = express.Router();
 
 router.use(csrfMiddleware);
@@ -45,6 +49,9 @@ router.post("/", async (req, res) => {
 router.patch("/", async (req, res) => {
   const profile = req.user as User;
   const body: v1.operations["patch-profile"]["requestBody"]["content"]["application/json"] = req.body;
+  if (!body) {
+    return res.sendStatus(400);
+  }
   try {
     await database.userPatch({
       uid: profile.uid,
@@ -52,6 +59,107 @@ router.patch("/", async (req, res) => {
     });
     return res.sendStatus(204);
   } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
+});
+
+router.post("/file", async (req, res) => {
+  const profile = req.user as User;
+  const body: v1.operations["get-profile-file"]["requestBody"]["content"]["application/json"] = req.body;
+  if (!body || !body.id || (body.ttl && (typeof body.ttl !== "number" || body.ttl > 43200 || body.ttl < 60))) {
+    return res.sendStatus(400);
+  }
+  try {
+    const fileMetadata = await database.fileFind({ fileId: body.id });
+    if (fileMetadata.private && fileMetadata.owner !== profile.uid) {
+      return res.sendStatus(403);
+    }
+    const url = await signDownloadUrl({ uid: fileMetadata.owner, fileId: fileMetadata.id, filename: fileMetadata.name }, body.ttl ?? 14400);
+    const file: v1.operations["get-profile-file"]["responses"]["200"]["content"]["application/json"] = {
+      id: fileMetadata.id,
+      url: url,
+      ttl: body.ttl ?? 14400
+    };
+    return res.json(file);
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
+});
+
+router.put("/file", async (req, res) => {
+  const profile = req.user as User;
+  const body: v1.operations["put-profile-file"]["requestBody"]["content"]["application/json"] = req.body;
+  if (!body || !body.name) {
+    return res.sendStatus(400);
+  }
+  try {
+    const fileId = uuidv4();
+    await database.fileCreate({ id: fileId, name: body.name, owner: profile.uid, private: body.private ?? true });
+    const url = await signUploadUrl({ uid: profile.uid, fileId: fileId });
+    const file: v1.operations["put-profile-file"]["responses"]["200"]["content"]["application/json"] = {
+      id: fileId,
+      url: url,
+      ttl: 14400
+    };
+    return res.json(file);
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
+});
+
+router.patch("/file", async (req, res) => {
+  const profile = req.user as User;
+  const body: v1.operations["patch-profile-file"]["requestBody"]["content"]["application/json"] = req.body;
+  if (!body || !body.id) {
+    return res.sendStatus(400);
+  }
+  try {
+    const fileMetadata = await database.fileFind({ fileId: body.id });
+    if (fileMetadata.owner !== profile.uid) {
+      return res.sendStatus(403);
+    }
+    await database.filePatch({
+      fileId: body.id,
+      private: body.private,
+      name: body.name
+    });
+    return res.sendStatus(204);
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
+});
+
+router.delete("/file", async (req, res) => {
+  const profile = req.user as User;
+  const body: v1.operations["delete-profile-file"]["requestBody"]["content"]["application/json"] = req.body;
+  if (!body || !body.id) {
+    return res.sendStatus(400);
+  }
+  try {
+    const fileMetadata = await database.fileFind({ fileId: body.id });
+    if (fileMetadata.owner !== profile.uid) {
+      return res.sendStatus(403);
+    }
+    await database.fileDelete({
+      fileId: body.id
+    });
+    return res.sendStatus(204);
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
+});
+
+router.post("/files", async (req, res) => {
+  const profile = req.user as User;
+  try {
+    return res.sendStatus(500);
+  } catch (error) {
+    console.error(error);
     return res.sendStatus(500);
   }
 });
