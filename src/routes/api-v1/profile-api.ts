@@ -4,7 +4,7 @@ import { v1 } from "moos-api";
 import database from "../../database";
 import { csrfMiddleware, ensureLoggedIn } from "../../middleware";
 import "../../files";
-import { signDownloadUrl, signUploadUrl } from "../../files";
+import { signDownloadUrl, signUploadUrl, listFiles, FileEntry } from "../../files";
 import { v4 as uuidv4 } from "uuid";
 
 const router: Router = express.Router();
@@ -157,7 +157,24 @@ router.delete("/file", async (req, res) => {
 router.post("/files", async (req, res) => {
   const profile = req.user as User;
   try {
-    return res.sendStatus(500);
+    const metadata = await Promise.all((profile.files ?? []).map((fileId) => database.fileFind({ fileId: fileId })));
+    const definitions = await listFiles({ uid: profile.uid });
+    const files: v1.operations["get-profile-files"]["responses"]["200"]["content"]["application/json"] = await Promise.all(
+      metadata.map(async (metadata) => {
+        const definition: FileEntry = definitions.find((file) => file.key === `${profile.uid}/${metadata.id}`) ?? {};
+        const file: v1.File = {
+          id: metadata.id,
+          name: metadata.name,
+          owner: metadata.owner,
+          private: metadata.private,
+          lastModified: definition.lastModified ?? metadata.creationDate,
+          size: definition.size ?? -1,
+          creationDate: metadata.creationDate
+        };
+        return file;
+      })
+    );
+    return res.json(files);
   } catch (error) {
     console.error(error);
     return res.sendStatus(500);

@@ -30,7 +30,7 @@ export async function listFiles(options: { uid: string }): Promise<FileEntry[]> 
     marker = response.IsTruncated ? response.NextMarker : null;
     if (response.Contents) {
       contents = contents.concat(
-        response.Contents.map((object) => ({ key: object.Key, size: object.Size, lastModified: object.LastModified } as FileEntry))
+        response.Contents.map((object) => ({ key: object.Key, size: object.Size, lastModified: object.LastModified?.getTime() } as FileEntry))
       );
     }
   }
