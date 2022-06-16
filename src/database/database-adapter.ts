@@ -13,6 +13,18 @@ export enum AuthScope {
   files = "files"
 }
 
+export enum Language {
+  en_EN = "en_EN",
+  de_DE = "de_DE",
+  ja_JP = "ja_JP"
+}
+
+export const enum Visibility {
+  public = "public",
+  private = "private",
+  unlisted = "unlisted"
+}
+
 export type User = {
   uid: string;
   username: string;
@@ -20,8 +32,9 @@ export type User = {
   scopes: "*"[];
   private: boolean;
   providers?: ProviderReferences;
-  applications: Array<string>;
-  files: Array<string>;
+  applications: string[];
+  files: string[];
+  collections: string[];
   creationDate: number;
 };
 
@@ -54,6 +67,46 @@ export type File = {
   name: string;
   owner: string;
   private: boolean;
+  creationDate: number;
+};
+
+export type Collection = {
+  id: string;
+  name: string;
+  visibility: "public" | "private" | "unlisted";
+  seasons: string[];
+  thumbnail: string | null;
+  owner: string;
+  creationDate: number;
+};
+
+export type Season = {
+  collectionId: string;
+  id: string;
+  index: number;
+  episodes: string[];
+  languages: Language[];
+  subtitles: Language[];
+};
+
+export type Episode = {
+  seasonId: string;
+  id: string;
+  index: number;
+  name: string;
+  sources: string[];
+  creationDate: number;
+};
+
+export type Source = {
+  seasonId: string;
+  episodeId: string;
+  id: string;
+  language: Language;
+  name: string | null;
+  url: string | null;
+  key: string | null;
+  subtitles: Language | null;
   creationDate: number;
 };
 
@@ -97,6 +150,26 @@ export default interface DatabaseAdapter {
   fileCreate(options: CreateFileOptions): Promise<void>;
   filePatch(options: PatchFileOptiopns): Promise<void>;
   fileDelete(options: DeleteFileOptions): Promise<void>;
+
+  collectionFind(options: FindCollectionByIdOptions): Promise<Collection>;
+  collectionCreate(options: CreateCollectionOptions): Promise<Collection>;
+  collectionPatch(options: PatchCollectionOptiopns): Promise<void>;
+  collectionDelete(options: DeleteCollectionOptions): Promise<void>;
+
+  seasonFind(options: FindSeasonByIdOptions): Promise<Season>;
+  seasonCreate(options: CreateSeasonOptions): Promise<Season>;
+  seasonPatch(options: PatchSeasonOptiopns): Promise<void>;
+  seasonDelete(options: DeleteSeasonOptions): Promise<void>;
+
+  episodeFind(options: FindEpisodeByIdOptions): Promise<Episode>;
+  episodeCreate(options: CreateEpisodeOptions): Promise<Episode>;
+  episodePatch(options: PatchEpisodeOptiopns): Promise<void>;
+  episodeDelete(options: DeleteEpisodeOptions): Promise<void>;
+
+  sourceFind(options: FindSourceByIdOptions): Promise<Source>;
+  sourceCreate(options: CreateSourceOptions): Promise<Source>;
+  sourcePatch(options: PatchSourceOptiopns): Promise<void>;
+  sourceDelete(options: DeleteSourceOptions): Promise<void>;
 
   authorizationCodesFind(options: FindAuthorizationCodeOptions): Promise<AuthorizationCode>;
   authorizationCodesRemove(options: RemoveAuthorizationCodeOptions): Promise<void>;
@@ -162,6 +235,104 @@ export type PatchFileOptiopns = {
 
 export type DeleteFileOptions = {
   fileId: string;
+};
+
+export type FindCollectionByIdOptions = {
+  collectionId: string;
+};
+
+export type CreateCollectionOptions = {
+  id: string;
+  name: string;
+  visibility: "public" | "private" | "unlisted";
+  thumbnail?: string;
+  owner: string;
+};
+
+export type PatchCollectionOptiopns = {
+  collectionId: string;
+  name?: string;
+  visibility?: "public" | "private" | "unlisted";
+  thumbnail?: string;
+};
+
+export type DeleteCollectionOptions = {
+  collectionId: string;
+};
+
+export type FindSeasonByIdOptions = {
+  seasonId: string;
+};
+
+export type CreateSeasonOptions = {
+  collectionId: string;
+  id: string;
+  index: number;
+};
+
+export type PatchSeasonOptiopns = {
+  seasonId: string;
+  index: number;
+};
+
+export type DeleteSeasonOptions = {
+  seasonId: string;
+};
+
+export type FindEpisodeByIdOptions = {
+  seasonId: string;
+  episodeId: string;
+};
+
+export type CreateEpisodeOptions = {
+  seasonId: string;
+  id: string;
+  index: number;
+  name: string;
+};
+
+export type PatchEpisodeOptiopns = {
+  seasonId: string;
+  episodeId: string;
+  index?: number;
+  name?: string;
+};
+
+export type DeleteEpisodeOptions = {
+  seasonId: string;
+  episodeId: string;
+};
+
+export type FindSourceByIdOptions = {
+  sourceId: string;
+};
+
+export type CreateSourceOptions = {
+  seasonId: string;
+  episodeId: string;
+  id: string;
+  language: Language;
+  name?: string;
+  url?: string;
+  key?: string;
+  subtitles?: Language;
+};
+
+export type PatchSourceOptiopns = {
+  seasonId: string;
+  episodeId: string;
+  sourceId: string;
+  language?: Language;
+  name?: string;
+  url?: string;
+  key?: string;
+  subtitles?: Language;
+};
+
+export type DeleteSourceOptions = {
+  seasonId: string;
+  episodeId: string;
+  sourceId: string;
 };
 
 export type FindUserByIdOptions = {

@@ -7,21 +7,39 @@ import DatabaseAdapter, {
   ApplicationToken,
   AuthorizationCode,
   CheckApplicationSecretOptions,
+  Collection,
   CreateApplicationOptions,
+  CreateCollectionOptions,
+  CreateEpisodeOptions,
   CreateFileOptions,
+  CreateSeasonOptions,
+  CreateSourceOptions,
   CreateUserOptions,
+  DeleteCollectionOptions,
+  DeleteEpisodeOptions,
   DeleteFileOptions,
+  DeleteSeasonOptions,
+  DeleteSourceOptions,
+  Episode,
   File,
   FindAccessTokenByIdOptions,
   FindAccessTokenOptions,
   FindApplicationByIdOptions,
   FindAuthorizationCodeOptions,
+  FindCollectionByIdOptions,
+  FindEpisodeByIdOptions,
   FindFileByIdOptions,
   FindProviderProfileByIdOptions,
   FindRefreshTokenByIdOptions,
   FindRefreshTokenOptions,
+  FindSeasonByIdOptions,
+  FindSourceByIdOptions,
   FindUserByIdOptions,
+  PatchCollectionOptiopns,
+  PatchEpisodeOptiopns,
   PatchFileOptiopns,
+  PatchSeasonOptiopns,
+  PatchSourceOptiopns,
   PatchUserOptiopns,
   ProviderProfile,
   ProviderReferences,
@@ -32,6 +50,8 @@ import DatabaseAdapter, {
   SaveAccessTokenOptions,
   SaveAuthorizationCodeOptions,
   SaveRefreshTokenOptions,
+  Season,
+  Source,
   TokenReference,
   UpdateApplicationNameOptions,
   UpdateApplicationRedirectUriOptions,
@@ -53,6 +73,10 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
   accessTokens: Reference;
   refreshTokens: Reference;
   tokens: Reference;
+  collections: Reference;
+  seasons: Reference;
+  episodes: Reference;
+  sources: Reference;
 
   constructor(database: Database) {
     this.database = database;
@@ -64,7 +88,12 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     this.accessTokens = database.ref("tokens/accessTokens");
     this.refreshTokens = database.ref("tokens/refreshTokens");
     this.tokens = database.ref("tokens");
+    this.collections = database.ref("eiswald/collections");
+    this.seasons = database.ref("eiswald/seasons");
+    this.episodes = database.ref("eiswald/episodes");
+    this.sources = database.ref("eiswald/sources");
   }
+
   async applicationFindById(options: FindApplicationByIdOptions): Promise<Application> {
     return (await this.applications.child(options.applicationId).get()).val();
   }
@@ -116,6 +145,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
       ...options,
       applications: [],
       files: [],
+      collections: [],
       creationDate: Date.now()
     };
     await this.profiles.child(user.uid).set(user);
@@ -150,12 +180,13 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     };
     await this.files.child(options.id).set(file);
     const files = ((await this.userFindById({ uid: options.owner })).files ?? []).concat(file.id);
-    await this.profiles.child(options.owner).child("files").update(files);
+    await this.profiles.child(options.owner).child("files").set(files);
   }
   async filePatch(options: PatchFileOptiopns): Promise<void> {
     if (options.name !== undefined) {
       await this.files.child(options.fileId).child("name").set(options.name);
-    } else if (options.private !== undefined) {
+    }
+    if (options.private !== undefined) {
       await this.files.child(options.fileId).child("private").set(options.private);
     }
   }
@@ -163,8 +194,206 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     const file = await this.fileFind({ fileId: options.fileId });
     await this.files.child(file.id).remove();
     const profile = await this.userFindById({ uid: file.owner });
-    profile.files.filter((fileId) => fileId !== file.id);
-    await this.profiles.child(file.owner).child("files").update(profile.files);
+    profile.files = (profile.files ?? []).filter((fileId) => fileId !== file.id);
+    await this.profiles.child(file.owner).child("files").set(profile.files);
+  }
+
+  async collectionFind(options: FindCollectionByIdOptions): Promise<Collection> {
+    return (await this.collections.child(options.collectionId).get()).val();
+  }
+  async collectionCreate(options: CreateCollectionOptions): Promise<Collection> {
+    const collection: Collection = {
+      ...options,
+      thumbnail: options.thumbnail ?? null,
+      seasons: [],
+      creationDate: Date.now()
+    };
+    await this.collections.child(collection.id).set(collection);
+    const collections = ((await this.userFindById({ uid: options.owner })).collections ?? []).concat(collection.id);
+    await this.profiles.child(options.owner).child("collections").set(collections);
+    return collection;
+  }
+  async collectionPatch(options: PatchCollectionOptiopns): Promise<void> {
+    if (options.name !== undefined) {
+      await this.collections.child(options.collectionId).child("name").set(options.name);
+    }
+    if (options.visibility !== undefined) {
+      await this.collections.child(options.collectionId).child("visibility").set(options.visibility);
+    }
+    if (options.thumbnail !== undefined) {
+      await this.collections.child(options.collectionId).child("thumbnail").set(options.thumbnail);
+    }
+  }
+  async collectionDelete(options: DeleteCollectionOptions): Promise<void> {
+    const collection = await this.collectionFind({ collectionId: options.collectionId });
+    await this.collections.child(collection.id).remove();
+    const profile = await this.userFindById({ uid: collection.owner });
+    profile.collections = (profile.collections ?? []).filter((collectionId) => collectionId !== collection.id);
+    await this.profiles.child(collection.owner).child("collections").set(profile.collections);
+    if (collection.seasons && collection.seasons.length !== 0) {
+      collection.seasons.forEach(async (seasonId) => {
+        await this.seasonDelete({ seasonId: seasonId });
+      });
+    }
+  }
+
+  async seasonFind(options: FindSeasonByIdOptions): Promise<Season> {
+    return (await this.seasons.child(options.seasonId).get()).val();
+  }
+  async seasonCreate(options: CreateSeasonOptions): Promise<Season> {
+    const season: Season = {
+      ...options,
+      episodes: [],
+      languages: [],
+      subtitles: []
+    };
+    await this.seasons.child(season.id).set(season);
+    const seasons = ((await this.collectionFind({ collectionId: options.collectionId })).seasons ?? []).concat(season.id);
+    await this.collections.child(options.collectionId).child("seasons").set(seasons);
+    return season;
+  }
+  async seasonPatch(options: PatchSeasonOptiopns): Promise<void> {
+    if (options.index !== undefined) {
+      await this.seasons.child(options.seasonId).child("index").set(options.index);
+    }
+  }
+  async seasonDelete(options: DeleteSeasonOptions): Promise<void> {
+    const season = await this.seasonFind({ seasonId: options.seasonId });
+    await this.seasons.child(season.id).remove();
+    const collection = await this.collectionFind({ collectionId: season.collectionId });
+    collection.seasons = (collection.seasons ?? []).filter((seasonId) => seasonId !== season.id);
+    await this.collections.child(collection.id).child("seasons").set(collection.seasons);
+    if (season.episodes && season.episodes.length !== 0) {
+      season.episodes.forEach(async (episodeId) => {
+        await this.episodeDelete({ seasonId: season.id, episodeId: episodeId });
+      });
+    }
+  }
+
+  async episodeFind(options: FindEpisodeByIdOptions): Promise<Episode> {
+    return (await this.episodes.child(options.seasonId).child(options.episodeId).get()).val();
+  }
+  async episodeCreate(options: CreateEpisodeOptions): Promise<Episode> {
+    const episode: Episode = {
+      ...options,
+      sources: [],
+      creationDate: Date.now()
+    };
+    await this.episodes.child(options.seasonId).child(episode.id).set(episode);
+    const episodes = ((await this.seasonFind({ seasonId: options.seasonId })).episodes ?? []).concat(episode.id);
+    await this.seasons.child(options.seasonId).child("episodes").set(episodes);
+    return episode;
+  }
+  async episodePatch(options: PatchEpisodeOptiopns): Promise<void> {
+    if (options.index !== undefined) {
+      await this.episodes.child(options.seasonId).child(options.episodeId).child("index").set(options.index);
+    }
+    if (options.name !== undefined) {
+      await this.episodes.child(options.seasonId).child(options.episodeId).child("name").set(options.name);
+    }
+  }
+  async episodeDelete(options: DeleteEpisodeOptions): Promise<void> {
+    const episode = await this.episodeFind({ seasonId: options.seasonId, episodeId: options.episodeId });
+    await this.episodes.child(options.seasonId).child(episode.id).remove();
+    const season = await this.seasonFind({ seasonId: options.seasonId });
+    season.episodes = (season.episodes ?? []).filter((episodeId) => episodeId !== episode.id);
+    await this.seasons.child(season.id).child("episodes").set(season.episodes);
+    if (episode.sources && episode.sources.length !== 0) {
+      episode.sources.forEach(async (sourceId) => {
+        await this.sourceDelete({ seasonId: season.id, episodeId: episode.id, sourceId: sourceId });
+      });
+    }
+  }
+
+  async sourceFind(options: FindSourceByIdOptions): Promise<Source> {
+    return (await this.sources.child(options.sourceId).get()).val();
+  }
+  async sourceCreate(options: CreateSourceOptions): Promise<Source> {
+    const source: Source = {
+      ...options,
+      name: options.name ?? null,
+      url: options.url ?? null,
+      key: options.key ?? null,
+      subtitles: options.subtitles ?? null,
+      creationDate: Date.now()
+    };
+    await this.sources.child(options.id).set(source);
+    const sources = ((await this.episodeFind({ seasonId: options.seasonId, episodeId: options.episodeId })).sources ?? []).concat(source.id);
+    await this.episodes.child(options.seasonId).child(options.episodeId).child("sources").set(sources);
+    await this.updateLanguages({ seasonId: options.seasonId });
+    await this.updateSubtitles({ seasonId: options.seasonId });
+    return source;
+  }
+  async sourcePatch(options: PatchSourceOptiopns): Promise<void> {
+    if (options.language !== undefined) {
+      await this.sources.child(options.sourceId).child("language").set(options.language);
+    }
+    if (options.name !== undefined) {
+      await this.sources.child(options.sourceId).child("name").set(options.name);
+    }
+    if (options.url !== undefined) {
+      await this.sources.child(options.sourceId).child("url").set(options.url);
+    }
+    if (options.key !== undefined) {
+      await this.sources.child(options.sourceId).child("key").set(options.key);
+    }
+    if (options.subtitles !== undefined) {
+      await this.sources.child(options.sourceId).child("subtitles").set(options.subtitles);
+    }
+    if (options.language || options.subtitles) {
+      await this.updateLanguages({ seasonId: options.seasonId });
+      await this.updateSubtitles({ seasonId: options.seasonId });
+    }
+  }
+  async sourceDelete(options: DeleteSourceOptions): Promise<void> {
+    const source = await this.sourceFind({ sourceId: options.sourceId });
+    await this.sources.child(source.id).remove();
+    const episode = await this.episodeFind({ seasonId: options.seasonId, episodeId: options.episodeId });
+    episode.sources = (episode.sources ?? []).filter((sourceId) => sourceId !== source.id);
+    await this.episodes.child(options.seasonId).child(options.episodeId).child("sources").set(episode.sources);
+    await this.updateLanguages({ seasonId: options.seasonId });
+    await this.updateSubtitles({ seasonId: options.seasonId });
+  }
+
+  private async updateLanguages(options: { seasonId: string }) {
+    const season = await this.seasonFind({ seasonId: options.seasonId });
+
+    const languages = (
+      await Promise.all(
+        season.episodes.map(
+          async (episodeId) =>
+            await Promise.all(
+              (
+                await this.episodeFind({ seasonId: season.id, episodeId: episodeId })
+              ).sources.map(async (sourceId) => (await this.sourceFind({ sourceId: sourceId })).language)
+            )
+        )
+      )
+    ).flat();
+    await this.seasons
+      .child(season.id)
+      .child("languages")
+      .set([...new Set(languages)]);
+  }
+
+  private async updateSubtitles(options: { seasonId: string }) {
+    const season = await this.seasonFind({ seasonId: options.seasonId });
+    const subtitles = (
+      await Promise.all(
+        season.episodes.map(
+          async (episodeId) =>
+            await Promise.all(
+              (
+                await this.episodeFind({ seasonId: season.id, episodeId: episodeId })
+              ).sources.map(async (sourceId) => (await this.sourceFind({ sourceId: sourceId })).subtitles)
+            )
+        )
+      )
+    ).flat();
+    await this.seasons
+      .child(season.id)
+      .child("subtitles")
+      .set([...new Set(subtitles)]);
   }
 
   async authorizationCodesFind(options: FindAuthorizationCodeOptions): Promise<AuthorizationCode> {
