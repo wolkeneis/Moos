@@ -334,7 +334,7 @@ router.post("/list", async (req, res) => {
 router.put("/list", async (req, res) => {
   const profile = req.user as User;
   const body: v1.operations["put-profile-list"]["requestBody"]["content"]["application/json"] = req.body;
-  if (!body || !body.groupId || !body.index) {
+  if (!body || !body.groupId || body.index === undefined) {
     return res.sendStatus(400);
   }
   try {
@@ -369,7 +369,7 @@ router.put("/list", async (req, res) => {
 router.patch("/list", async (req, res) => {
   const profile = req.user as User;
   const body: v1.operations["patch-profile-list"]["requestBody"]["content"]["application/json"] = req.body;
-  if (!body || !body.id || !body.index) {
+  if (!body || !body.id || body.index === undefined) {
     return res.sendStatus(400);
   }
   try {
@@ -463,7 +463,7 @@ router.post("/episode", async (req, res) => {
 router.put("/episode", async (req, res) => {
   const profile = req.user as User;
   const body: v1.operations["put-profile-episode"]["requestBody"]["content"]["application/json"] = req.body;
-  if (!body || !body.seasonId || !body.index || !body.name) {
+  if (!body || !body.seasonId || body.index === undefined || !body.name) {
     return res.sendStatus(400);
   }
   try {
@@ -497,7 +497,7 @@ router.put("/episode", async (req, res) => {
 router.patch("/episode", async (req, res) => {
   const profile = req.user as User;
   const body: v1.operations["patch-profile-episode"]["requestBody"]["content"]["application/json"] = req.body;
-  if (!body || !body.id || !body.seasonId || !(body.index || body.name)) {
+  if (!body || !body.id || !body.seasonId || !(body.index !== undefined || body.name)) {
     return res.sendStatus(400);
   }
   try {
