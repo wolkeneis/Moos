@@ -610,7 +610,7 @@ router.put("/source", async (req, res) => {
       name: body.name,
       url: body.url,
       key: body.key,
-      subtitles: (body.subtitles as Language) ?? null
+      subtitles: body.subtitles as Language
     });
     const response: v1.operations["put-profile-source"]["responses"]["200"]["content"]["application/json"] = {
       seasonId: season.id,
