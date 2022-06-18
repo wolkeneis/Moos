@@ -584,7 +584,7 @@ router.put("/source", async (req, res) => {
     if (collection.owner !== profile.uid) {
       return res.sendStatus(403);
     }
-    if (!(body.language in Language) || !(body.subtitles && body.subtitles in Language)) {
+    if (!(body.language in Language) || (body.subtitles && !(body.subtitles in Language))) {
       return res.sendStatus(400);
     }
     if (body.key) {
@@ -610,7 +610,7 @@ router.put("/source", async (req, res) => {
       name: body.name,
       url: body.url,
       key: body.key,
-      subtitles: body.subtitles as Language
+      subtitles: (body.subtitles as Language) ?? null
     });
     const response: v1.operations["put-profile-source"]["responses"]["200"]["content"]["application/json"] = {
       seasonId: season.id,

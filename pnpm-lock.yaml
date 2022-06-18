@@ -33,7 +33,7 @@ specifiers:
   firebase-admin: ^11.0.0
   husky: ^8.0.1
   lint-staged: ^13.0.2
-  moos-api: ^0.3.1
+  moos-api: ^0.3.2
   node-fetch: v2
   nodemon: ^2.0.16
   passport: ^0.6.0
@@ -61,7 +61,7 @@ dependencies:
   express: 4.18.1
   express-session: 1.17.3
   firebase-admin: 11.0.0
-  moos-api: 0.3.1
+  moos-api: 0.3.2
   node-fetch: 2.6.7
   passport: 0.6.0
   passport-discord: 0.1.4
@@ -3669,8 +3669,8 @@ packages:
     hasBin: true
     dev: false
 
-  /moos-api/0.3.1:
-    resolution: {integrity: sha512-l9PWEf/A3f6da1Qq4RHRcnJbUjbwFhqBtz4gCiz6UEPcsA09JXYyGUHom5PWTJA5yrUMFMaNsTq5L7obIwUowg==}
+  /moos-api/0.3.2:
+    resolution: {integrity: sha512-owg6vXtM0WkyVhtaxFMjlQBshLRbHLYPxNMjjr+h/H6FlCgEt0rUUkivaktp3/+IDDDSN5NJfsB/NR6NN2Cujg==}
     dev: false
 
   /ms/2.0.0:

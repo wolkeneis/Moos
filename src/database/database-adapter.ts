@@ -16,7 +16,8 @@ export enum AuthScope {
 export enum Language {
   en_EN = "en_EN",
   de_DE = "de_DE",
-  ja_JP = "ja_JP"
+  ja_JP = "ja_JP",
+  zh_CN = "zh_CN"
 }
 
 export const enum Visibility {

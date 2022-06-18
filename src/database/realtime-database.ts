@@ -389,7 +389,9 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
             )
         )
       )
-    ).flat();
+    )
+      .flat()
+      .filter((subtitles) => !!subtitles);
     await this.seasons
       .child(season.id)
       .child("subtitles")
