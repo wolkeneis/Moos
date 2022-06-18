@@ -365,7 +365,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
             await Promise.all(
               (
                 await this.episodeFind({ seasonId: season.id, episodeId: episodeId })
-              ).sources.map(async (sourceId) => (await this.sourceFind({ sourceId: sourceId })).language)
+              ).sources?.map(async (sourceId) => (await this.sourceFind({ sourceId: sourceId })).language)
             )
         )
       )
@@ -385,7 +385,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
             await Promise.all(
               (
                 await this.episodeFind({ seasonId: season.id, episodeId: episodeId })
-              ).sources.map(async (sourceId) => (await this.sourceFind({ sourceId: sourceId })).subtitles)
+              ).sources?.map(async (sourceId) => (await this.sourceFind({ sourceId: sourceId })).subtitles)
             )
         )
       )
