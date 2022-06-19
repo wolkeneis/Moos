@@ -1,7 +1,7 @@
-import { User } from "database/database-adapter";
 import express, { Router } from "express";
-import { v1 } from "moos-api";
+import type { v1 } from "moos-api";
 import passport from "passport";
+import type { User } from "../../database/database-adapter.js";
 
 const router: Router = express.Router();
 

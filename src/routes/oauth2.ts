@@ -1,11 +1,11 @@
-import { OAuth2Info, OAuth2Transaction } from "@wolkeneis/oauth2-server";
+import type { OAuth2Info, OAuth2Transaction } from "@wolkeneis/oauth2-server";
 import express, { Router } from "express";
 import passport from "passport";
-import database from "../database";
-import { Application, User } from "../database/database-adapter";
-import { envRequire } from "../environment";
-import { csrfMiddleware, ensureLoggedIn, sessionMiddleware } from "../middleware";
-import server, { parseAuthScope } from "../oauth2";
+import database from "../database/index.js";
+import type { Application, User } from "../database/database-adapter.js";
+import { envRequire } from "../environment.js";
+import { csrfMiddleware, ensureLoggedIn, sessionMiddleware } from "../middleware.js";
+import server, { parseAuthScope } from "../oauth2.js";
 
 const router: Router = express.Router();
 

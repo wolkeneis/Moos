@@ -1,6 +1,5 @@
-import { Application, AuthProvider, User } from "./database/database-adapter";
-import { Request } from "express";
-import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
+import type { Request } from "express";
+import type { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
 import passport from "passport";
 import { Profile as DiscordProfile, Strategy as DiscordStrategy } from "passport-discord";
 import { Profile as GoogleProfile, Strategy as GoogleStrategy, VerifyCallback } from "passport-google-oauth20";
@@ -8,9 +7,10 @@ import { BasicStrategy } from "passport-http";
 import { Strategy as BearerStrategy } from "passport-http-bearer";
 import { Strategy as ClientPasswordStrategy } from "passport-oauth2-client-password";
 import { v4 as uuidv4 } from "uuid";
-import { createUser, verifyCookie } from "./auth";
-import database from "./database";
-import { envRequire } from "./environment";
+import { createUser, verifyCookie } from "./auth.js";
+import database from "./database/index.js";
+import { type Application, AuthProvider, type User } from "./database/database-adapter.js";
+import { envRequire } from "./environment.js";
 
 passport.serializeUser((user, done) => {
   done(null, (user as User).uid);

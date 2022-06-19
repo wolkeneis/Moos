@@ -1,9 +1,9 @@
 import express, { Router } from "express";
-import { v1 } from "moos-api";
-import { createCookie, verifyCookie } from "../../auth";
-import { env } from "../../environment";
-import { auth } from "../../firebase";
-import { csrfMiddleware } from "../../middleware";
+import type { v1 } from "moos-api";
+import { createCookie, verifyCookie } from "../../auth.js";
+import { env } from "../../environment.js";
+import { auth } from "../../firebase.js";
+import { csrfMiddleware } from "../../middleware.js";
 
 const router: Router = express.Router();
 

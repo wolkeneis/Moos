@@ -1,6 +1,6 @@
 import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
-import database from "./database";
-import { auth } from "./firebase";
+import database from "./database/index.js";
+import { auth } from "./firebase.js";
 
 export function verifyCookie(cookie: string): Promise<DecodedIdToken | null> {
   return auth.verifySessionCookie(cookie, true).catch(() => null);

@@ -1,11 +1,11 @@
-import express from "express";
+import express, { Router } from "express";
 import passport from "passport";
-import { createToken } from "../auth";
-import { env, envRequire } from "../environment";
-import { csrfMiddleware } from "../middleware";
-import "../strategies";
+import { createToken } from "../auth.js";
+import { env, envRequire } from "../environment.js";
+import { csrfMiddleware } from "../middleware.js";
+import "../strategies.js";
 
-const router = express.Router();
+const router: Router = express.Router();
 
 router.use(csrfMiddleware);
 

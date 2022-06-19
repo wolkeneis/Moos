@@ -1,7 +1,7 @@
 import { DeleteObjectCommand, GetObjectCommand, ListObjectsCommand, ListObjectsCommandOutput, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { URL } from "url";
-import { env, envRequire } from "./environment";
+import { env, envRequire } from "./environment.js";
 
 const bucket = envRequire("S3_BUCKET");
 

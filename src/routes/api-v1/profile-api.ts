@@ -1,10 +1,10 @@
-import { AuthProvider, Language, User, Visibility } from "../../database/database-adapter";
 import express, { Router } from "express";
-import { v1 } from "moos-api";
-import database from "../../database";
-import { csrfMiddleware, ensureLoggedIn } from "../../middleware";
-import { signDownloadUrl, signUploadUrl, listFiles, FileEntry } from "../../files";
+import type { v1 } from "moos-api";
 import { v4 as uuidv4 } from "uuid";
+import database from "../../database/index.js";
+import { AuthProvider, Language, type User, Visibility } from "../../database/database-adapter.js";
+import { FileEntry, listFiles, signDownloadUrl, signUploadUrl } from "../../files.js";
+import { csrfMiddleware, ensureLoggedIn } from "../../middleware.js";
 
 const router: Router = express.Router();
 

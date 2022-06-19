@@ -1,5 +1,5 @@
-import { env, envRequire } from "./environment";
 import admin, { ServiceAccount } from "firebase-admin";
+import { env, envRequire } from "./environment.js";
 
 const app = admin.initializeApp({
   credential: admin.credential.cert(JSON.parse(envRequire("SERVICE_ACCOUNT")) as ServiceAccount),

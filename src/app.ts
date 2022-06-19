@@ -1,10 +1,10 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
-import "./environment";
-import { env } from "./environment";
-import { passportMiddleware } from "./middleware";
-import { api, login, oauth2 } from "./routes";
+import "./environment.js";
+import { env } from "./environment.js";
+import { passportMiddleware } from "./middleware.js";
+import { api, login, oauth2 } from "./routes/index.js";
 
 const app = express();
 

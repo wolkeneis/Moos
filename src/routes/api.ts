@@ -1,8 +1,8 @@
 import express, { Router } from "express";
-import applicationApi from "./api-v1/application-api";
-import csrfTokenApi from "./api-v1/csrf-token-api";
-import profileApi from "./api-v1/profile-api";
-import sessionApi from "./api-v1/session-api";
+import applicationApi from "./api-v1/application-api.js";
+import csrfTokenApi from "./api-v1/csrf-token-api.js";
+import profileApi from "./api-v1/profile-api.js";
+import sessionApi from "./api-v1/session-api.js";
 
 const router: Router = express.Router();
 

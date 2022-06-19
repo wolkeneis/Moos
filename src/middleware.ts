@@ -1,15 +1,15 @@
 import csurf from "csurf";
-import { RequestHandler } from "express";
+import type { RequestHandler } from "express";
 import session from "express-session";
 import passport from "passport";
-import { verifyCookie } from "./auth";
-import database from "./database";
-import "./environment";
-import { env, envRequire } from "./environment";
-import { firestore } from "./firebase";
-import FirestoreStore from "./firestore-sesison";
+import { verifyCookie } from "./auth.js";
+import database from "./database/index.js";
+import "./environment.js";
+import { env, envRequire } from "./environment.js";
+import { firestore } from "./firebase.js";
+import FirestoreStore from "./firestore-sesison.js";
 
-export const sessionMiddleware = session({
+export const sessionMiddleware: RequestHandler = session({
   store: new FirestoreStore({
     database: firestore,
     collection: "Sessions"
@@ -26,9 +26,9 @@ export const sessionMiddleware = session({
   }
 });
 
-export const passportMiddleware = passport.initialize();
+export const passportMiddleware: RequestHandler = passport.initialize();
 
-export const csrfMiddleware = csurf({
+export const csrfMiddleware: RequestHandler = csurf({
   cookie: {
     path: "/",
     sameSite: "none",
