@@ -1,9 +1,9 @@
 import express, { Router } from "express";
 import type { v1 } from "moos-api";
 import { v4 as uuidv4 } from "uuid";
+import { AuthProvider, Language, Visibility, type User } from "../../database/database-adapter.js";
 import database from "../../database/index.js";
-import { AuthProvider, Language, type User, Visibility } from "../../database/database-adapter.js";
-import { FileEntry, listFiles, signDownloadUrl, signUploadUrl } from "../../files.js";
+import { deleteFile, FileEntry, listFiles, signDownloadUrl, signUploadUrl } from "../../files.js";
 import { csrfMiddleware, ensureLoggedIn } from "../../middleware.js";
 
 const router: Router = express.Router();
@@ -155,6 +155,7 @@ router.delete("/file", async (req, res) => {
     await database.fileDelete({
       fileId: body.id
     });
+    await deleteFile({ uid: fileMetadata.owner, fileId: fileMetadata.id });
     return res.sendStatus(204);
   } catch (error) {
     console.error(error);

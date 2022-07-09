@@ -10,7 +10,11 @@ const app = express();
 
 app.set("trust proxy", 1);
 
-const whitelist = [env("CONTROL_ORIGIN") ?? "https://wolkeneis.dev", env("CONTROL_ORIGIN_2") ?? "https://www.wolkeneis.dev"];
+const whitelist = [
+  env("CONTROL_ORIGIN") ?? "https://wolkeneis.dev",
+  env("CONTROL_ORIGIN_2") ?? "https://eiswald.wolkeneis.dev",
+  env("CONTROL_ORIGIN_3") ?? "https://files.wolkeneis.dev"
+];
 
 app.use(
   cors({
