@@ -63,6 +63,111 @@ router.patch("/", async (req, res) => {
   }
 });
 
+router.post("/known", async (req, res) => {
+  const profile = req.user as User;
+  const body: v1.operations["post-profile-known"]["requestBody"]["content"]["application/json"] = req.body;
+  if (!body || !body.uid) {
+    return res.sendStatus(400);
+  }
+  try {
+    const known = await database.userFindById({ uid: body.uid });
+    if (known.private) {
+      if (known.known.includes(profile.uid)) {
+        const response: v1.KnownUserProfile = {
+          uid: known.uid,
+          username: known.username,
+          avatar: known.avatar,
+          scopes: known.scopes,
+          private: known.private,
+          applications: known.applications,
+          files: known.files.filter(async (fileId) => !(await database.fileFind({ fileId: fileId })).private),
+          collections: known.files.filter(
+            async (collectionId) => (await database.collectionFind({ collectionId: collectionId })).visibility === Visibility.public
+          ),
+          known: known.known,
+          creationDate: known.creationDate
+        };
+        return res.json(response);
+      } else {
+        const response: v1.KnownUserProfile = {
+          uid: known.uid,
+          username: known.username,
+          avatar: known.avatar,
+          private: known.private,
+          creationDate: known.creationDate
+        };
+        return res.json(response);
+      }
+    } else {
+      const response: v1.KnownUserProfile = {
+        uid: known.uid,
+        username: known.username,
+        avatar: known.avatar,
+        scopes: known.scopes,
+        private: known.private,
+        applications: known.applications,
+        files: known.files.filter(async (fileId) => !(await database.fileFind({ fileId: fileId })).private),
+        collections: known.files.filter(
+          async (collectionId) => (await database.collectionFind({ collectionId: collectionId })).visibility === Visibility.public
+        ),
+        known: known.known,
+        creationDate: known.creationDate
+      };
+      return res.json(response);
+    }
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
+});
+
+router.put("/known", async (req, res) => {
+  const profile = req.user as User;
+  const body: v1.operations["put-profile-known"]["requestBody"]["content"]["application/json"] = req.body;
+  if (!body || !body.uid) {
+    return res.sendStatus(400);
+  }
+  try {
+    const known = await database.userFindById({ uid: body.uid });
+    if (profile.known.includes(known.uid)) {
+      return res.sendStatus(400);
+    }
+    if (known.private) {
+      if (known.known.includes(profile.uid)) {
+        await database.knownCreate({ uid: profile.uid, knownId: known.uid });
+        return res.sendStatus(201);
+      } else {
+        return res.sendStatus(403);
+      }
+    } else {
+      await database.knownCreate({ uid: profile.uid, knownId: known.uid });
+      return res.sendStatus(201);
+    }
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
+});
+
+router.delete("/known", async (req, res) => {
+  const profile = req.user as User;
+  const body: v1.operations["delete-profile-known"]["requestBody"]["content"]["application/json"] = req.body;
+  if (!body || !body.uid) {
+    return res.sendStatus(400);
+  }
+  try {
+    const knownId = body.uid;
+    if (!profile.known.includes(knownId)) {
+      return res.sendStatus(404);
+    }
+    await database.knownDelete({ uid: profile.uid, knownId: knownId });
+    return res.sendStatus(204);
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
+});
+
 router.post("/file", async (req, res) => {
   const profile = req.user as User;
   const body: v1.operations["get-profile-file"]["requestBody"]["content"]["application/json"] = req.body;
@@ -201,7 +306,7 @@ router.post("/collection", async (req, res) => {
     if (!collection) {
       return res.sendStatus(404);
     }
-    if (collection.owner !== profile.uid && collection.visibility === "private") {
+    if (collection.owner !== profile.uid && collection.visibility === Visibility.private) {
       return res.sendStatus(403);
     }
     const response: v1.operations["post-profile-collection"]["responses"]["200"]["content"]["application/json"] = {
@@ -314,7 +419,7 @@ router.post("/list", async (req, res) => {
       return res.sendStatus(404);
     }
     const collection = await database.collectionFind({ collectionId: season.collectionId });
-    if (collection.owner !== profile.uid && collection.visibility === "private") {
+    if (collection.owner !== profile.uid && collection.visibility === Visibility.private) {
       return res.sendStatus(403);
     }
     const response: v1.operations["post-profile-list"]["responses"]["200"]["content"]["application/json"] = {
@@ -431,7 +536,7 @@ router.post("/episode", async (req, res) => {
     }
     const season = await database.seasonFind({ seasonId: body.seasonId });
     const collection = await database.collectionFind({ collectionId: season.collectionId });
-    if (collection.owner !== profile.uid && collection.visibility === "private") {
+    if (collection.owner !== profile.uid && collection.visibility === Visibility.private) {
       return res.sendStatus(403);
     }
     const sources = await Promise.all(
@@ -556,7 +661,7 @@ router.post("/source", async (req, res) => {
     }
     const season = await database.seasonFind({ seasonId: source.seasonId });
     const collection = await database.collectionFind({ collectionId: season.collectionId });
-    if (collection.owner !== profile.uid && collection.visibility === "private") {
+    if (collection.owner !== profile.uid && collection.visibility === Visibility.private) {
       return res.sendStatus(403);
     }
     if (!source.key && !source.url) {

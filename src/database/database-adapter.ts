@@ -36,6 +36,21 @@ export type User = {
   applications: string[];
   files: string[];
   collections: string[];
+  known: string[];
+  creationDate: number;
+};
+
+export type KnownUser = {
+  uid: string;
+  username: string;
+  avatar: string | null;
+  scopes?: "*"[];
+  private: boolean;
+  providers?: ProviderReferences;
+  applications?: string[];
+  files?: string[];
+  collections?: string[];
+  known?: string[];
   creationDate: number;
 };
 
@@ -146,6 +161,9 @@ export default interface DatabaseAdapter {
   userPatch(options: PatchUserOptiopns): Promise<void>;
   userProviderProfileUpdateOrCreate(options: UpdateOrCreateProviderProfileOptions): Promise<ProviderProfile>;
   userProviderProfileFindById(options: FindProviderProfileByIdOptions): Promise<ProviderProfile>;
+
+  knownCreate(options: CreateKnownOptions): Promise<void>;
+  knownDelete(options: DeleteKnownOptions): Promise<void>;
 
   fileFind(options: FindFileByIdOptions): Promise<File>;
   fileCreate(options: CreateFileOptions): Promise<void>;
@@ -351,6 +369,16 @@ export type CreateUserOptions = {
 export type PatchUserOptiopns = {
   uid: string;
   private?: boolean;
+};
+
+export type CreateKnownOptions = {
+  uid: string;
+  knownId: string;
+};
+
+export type DeleteKnownOptions = {
+  uid: string;
+  knownId: string;
 };
 
 export type UpdateOrCreateProviderProfileOptions = {

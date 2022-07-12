@@ -3,6 +3,8 @@ import crypto from "crypto";
 import { Reference } from "firebase-admin/database";
 import { Database } from "firebase-admin/lib/database/database";
 import DatabaseAdapter, {
+  type CreateKnownOptions,
+  type DeleteKnownOptions,
   type Application,
   type ApplicationToken,
   type AuthorizationCode,
@@ -146,6 +148,7 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
       applications: [],
       files: [],
       collections: [],
+      known: [],
       creationDate: Date.now()
     };
     await this.profiles.child(user.uid).set(user);
@@ -154,6 +157,15 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     if (options.private !== undefined) {
       await this.profiles.child(options.uid).child("private").set(options.private);
     }
+  }
+  async knownCreate(options: CreateKnownOptions): Promise<void> {
+    const known = ((await this.userFindById({ uid: options.uid })).known ?? []).concat(options.knownId);
+    await this.profiles.child(options.uid).child("known").set(known);
+  }
+  async knownDelete(options: DeleteKnownOptions): Promise<void> {
+    const profile = await this.userFindById({ uid: options.uid });
+    profile.known = (profile.known ?? []).filter((knownId) => knownId !== options.knownId);
+    await this.profiles.child(options.uid).child("known").set(profile.known);
   }
   async userProviderProfileUpdateOrCreate(options: UpdateOrCreateProviderProfileOptions): Promise<ProviderProfile> {
     const providerProfile: ProviderProfile = {
