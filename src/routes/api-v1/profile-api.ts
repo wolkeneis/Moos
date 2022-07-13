@@ -40,6 +40,8 @@ router.post("/", async (req, res) => {
     private: profile.private,
     providers: providers,
     applications: profile.applications,
+    collections: profile.collections,
+    known: profile.known,
     creationDate: profile.creationDate
   };
   return res.json(response);
@@ -106,9 +108,9 @@ router.post("/known", async (req, res) => {
         scopes: known.scopes,
         private: known.private,
         applications: known.applications,
-        files: known.files.filter(async (fileId) => !(await database.fileFind({ fileId: fileId })).private),
-        collections: known.files.filter(
-          async (collectionId) => (await database.collectionFind({ collectionId: collectionId })).visibility === Visibility.public
+        files: known.files.filter(async (fileId) => !(await database.fileFind({ fileId: fileId }))?.private),
+        collections: known.collections.filter(
+          async (collectionId) => (await database.collectionFind({ collectionId: collectionId }))?.visibility === Visibility.public
         ),
         known: known.known,
         creationDate: known.creationDate
