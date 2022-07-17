@@ -2,7 +2,7 @@ import type { OAuth2Info, OAuth2Transaction } from "@wolkeneis/oauth2-server";
 import express, { Router } from "express";
 import passport from "passport";
 import database from "../database/index.js";
-import type { Application, User } from "../database/database-adapter.js";
+import type { Application, Profile } from "../database/database-adapter.js";
 import { envRequire } from "../environment.js";
 import { csrfMiddleware, ensureLoggedIn, sessionMiddleware } from "../middleware.js";
 import server, { parseAuthScope } from "../oauth2.js";
@@ -22,7 +22,7 @@ router.get(
       if (application.redirectUri !== request.redirectUri) throw new Error("Redirect URIs do not match");
       return application;
     },
-    async (transaction: OAuth2Transaction<Application, User, unknown>): Promise<OAuth2Info> => {
+    async (transaction: OAuth2Transaction<Application, Profile, unknown>): Promise<OAuth2Info> => {
       const scope = parseAuthScope(transaction.request.scope);
       if (!scope || !scope.length) {
         throw new Error(`Invalid scope: ${transaction.request.scope}`);

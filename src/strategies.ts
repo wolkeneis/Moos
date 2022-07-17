@@ -9,11 +9,11 @@ import { Strategy as ClientPasswordStrategy } from "passport-oauth2-client-passw
 import { v4 as uuidv4 } from "uuid";
 import { createUser, verifyCookie } from "./auth.js";
 import database from "./database/index.js";
-import { type Application, AuthProvider, type User } from "./database/database-adapter.js";
+import { type Application, AuthProvider, type Profile } from "./database/database-adapter.js";
 import { envRequire } from "./environment.js";
 
 passport.serializeUser((user, done) => {
-  done(null, (user as User).uid);
+  done(null, (user as Profile).uid);
 });
 
 passport.deserializeUser(async (uid: string, done) => {

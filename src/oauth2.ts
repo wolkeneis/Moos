@@ -1,7 +1,7 @@
 import { CodeExchange, CodeGrant, OAuth2Server, OAuth2Tokens, OAuth2Transaction } from "@wolkeneis/oauth2-server";
 import crypto from "crypto";
 import database from "./database/index.js";
-import { type Application, AuthScope, type User } from "./database/database-adapter.js";
+import { type Application, AuthScope, type Profile } from "./database/database-adapter.js";
 
 const server: OAuth2Server = new OAuth2Server(
   async (application: unknown) => (application as Application).id,
@@ -33,7 +33,7 @@ async function issueTokens(applicationId: string, uid: string, scope: AuthScope[
 }
 
 server.addGrant(
-  new CodeGrant(async (transaction: OAuth2Transaction<Application, User, unknown>): Promise<string> => {
+  new CodeGrant(async (transaction: OAuth2Transaction<Application, Profile, unknown>): Promise<string> => {
     const code: string = randomToken(256);
     const scope = parseAuthScope(transaction.info?.scope);
     if (!scope || !scope.length) {

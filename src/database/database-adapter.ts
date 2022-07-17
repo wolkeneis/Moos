@@ -26,21 +26,7 @@ export const enum Visibility {
   unlisted = "unlisted"
 }
 
-export type User = {
-  uid: string;
-  username: string;
-  avatar: string | null;
-  scopes: "*"[];
-  private: boolean;
-  providers?: ProviderReferences;
-  applications: string[];
-  files: string[];
-  collections: string[];
-  known: string[];
-  creationDate: number;
-};
-
-export type KnownUser = {
+export type Profile = {
   uid: string;
   username: string;
   avatar: string | null;
@@ -50,7 +36,21 @@ export type KnownUser = {
   applications?: string[];
   files?: string[];
   collections?: string[];
-  known?: string[];
+  friends?: string[];
+  creationDate: number;
+};
+
+export type Friend = {
+  uid: string;
+  username: string;
+  avatar: string | null;
+  scopes?: "*"[];
+  private: boolean;
+  providers?: ProviderReferences;
+  applications?: string[];
+  files?: string[];
+  collections?: string[];
+  friends?: string[];
   creationDate: number;
 };
 
@@ -156,14 +156,14 @@ export default interface DatabaseAdapter {
   applicationRegenerateSecret(options: RegenerateApplicationSecretOptions): Promise<ApplicationSecret>;
   applicationCheckSecret(options: CheckApplicationSecretOptions): Promise<CheckResult>;
 
-  userFindById(options: FindUserByIdOptions): Promise<User>;
+  userFindById(options: FindUserByIdOptions): Promise<Profile>;
   userCreate(options: CreateUserOptions): Promise<void>;
   userPatch(options: PatchUserOptiopns): Promise<void>;
   userProviderProfileUpdateOrCreate(options: UpdateOrCreateProviderProfileOptions): Promise<ProviderProfile>;
   userProviderProfileFindById(options: FindProviderProfileByIdOptions): Promise<ProviderProfile>;
 
-  knownCreate(options: CreateKnownOptions): Promise<void>;
-  knownDelete(options: DeleteKnownOptions): Promise<void>;
+  friendAdd(options: AddFriendOptions): Promise<void>;
+  friendRemove(options: DeleteFriendOptions): Promise<void>;
 
   fileFind(options: FindFileByIdOptions): Promise<File>;
   fileCreate(options: CreateFileOptions): Promise<void>;
@@ -371,14 +371,14 @@ export type PatchUserOptiopns = {
   private?: boolean;
 };
 
-export type CreateKnownOptions = {
+export type AddFriendOptions = {
   uid: string;
-  knownId: string;
+  friendId: string;
 };
 
-export type DeleteKnownOptions = {
+export type DeleteFriendOptions = {
   uid: string;
-  knownId: string;
+  friendId: string;
 };
 
 export type UpdateOrCreateProviderProfileOptions = {

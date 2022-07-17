@@ -3,8 +3,8 @@ import crypto from "crypto";
 import { Reference } from "firebase-admin/database";
 import { Database } from "firebase-admin/lib/database/database";
 import DatabaseAdapter, {
-  type CreateKnownOptions,
-  type DeleteKnownOptions,
+  type AddFriendOptions,
+  type DeleteFriendOptions,
   type Application,
   type ApplicationToken,
   type AuthorizationCode,
@@ -58,7 +58,7 @@ import DatabaseAdapter, {
   type UpdateApplicationNameOptions,
   type UpdateApplicationRedirectUriOptions,
   type UpdateOrCreateProviderProfileOptions,
-  type User
+  type Profile
 } from "./database-adapter.js";
 
 function _randomToken(length: number): string {
@@ -139,16 +139,16 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
     return await argon2.verify(secret, options.secret);
   }
 
-  async userFindById(options: FindUserByIdOptions): Promise<User> {
+  async userFindById(options: FindUserByIdOptions): Promise<Profile> {
     return (await this.profiles.child(options.uid).get()).val();
   }
   async userCreate(options: CreateUserOptions): Promise<void> {
-    const user: User = {
+    const user: Profile = {
       ...options,
       applications: [],
       files: [],
       collections: [],
-      known: [],
+      friends: [],
       creationDate: Date.now()
     };
     await this.profiles.child(user.uid).set(user);
@@ -158,14 +158,14 @@ export default class RealtimeDatabaseImpl implements DatabaseAdapter {
       await this.profiles.child(options.uid).child("private").set(options.private);
     }
   }
-  async knownCreate(options: CreateKnownOptions): Promise<void> {
-    const known = ((await this.userFindById({ uid: options.uid })).known ?? []).concat(options.knownId);
-    await this.profiles.child(options.uid).child("known").set(known);
+  async friendAdd(options: AddFriendOptions): Promise<void> {
+    const friends = ((await this.userFindById({ uid: options.uid })).friends ?? []).concat(options.friendId);
+    await this.profiles.child(options.uid).child("friends").set(friends);
   }
-  async knownDelete(options: DeleteKnownOptions): Promise<void> {
+  async friendRemove(options: DeleteFriendOptions): Promise<void> {
     const profile = await this.userFindById({ uid: options.uid });
-    profile.known = (profile.known ?? []).filter((knownId) => knownId !== options.knownId);
-    await this.profiles.child(options.uid).child("known").set(profile.known);
+    profile.friends = (profile.friends ?? []).filter((friendId) => friendId !== options.friendId);
+    await this.profiles.child(options.uid).child("friends").set(profile.friends);
   }
   async userProviderProfileUpdateOrCreate(options: UpdateOrCreateProviderProfileOptions): Promise<ProviderProfile> {
     const providerProfile: ProviderProfile = {
