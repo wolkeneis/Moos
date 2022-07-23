@@ -225,7 +225,7 @@ router.post("/friend/:friendId/collections", async (req, res) => {
           if (fetchedCollection.thumbnail) {
             thumbnail = await database.fileFind({ fileId: fetchedCollection.thumbnail });
           }
-          const collection: v1.Collection = {
+          const collection: v1.CollectionPreview = {
             id: fetchedCollection.id,
             name: fetchedCollection.name,
             visibility: fetchedCollection.visibility,
@@ -421,7 +421,7 @@ router.post("/collections", async (req, res) => {
         if (fetchedCollection.thumbnail) {
           thumbnail = await database.fileFind({ fileId: fetchedCollection.thumbnail });
         }
-        const collection: v1.Collection = {
+        const collection: v1.CollectionPreview = {
           id: fetchedCollection.id,
           name: fetchedCollection.name,
           visibility: fetchedCollection.visibility,
@@ -464,9 +464,32 @@ router.post("/collection", async (req, res) => {
       id: collection.id,
       name: collection.name,
       visibility: collection.visibility,
-      seasons: collection.seasons ?? [],
-      thumbnail:
-        (thumbnail ? await signDownloadUrl({ uid: thumbnail.owner, fileId: thumbnail.id, filename: thumbnail.name }, 43200) : undefined) ?? undefined,
+      seasons: await Promise.all(
+        (
+          await Promise.all((collection.seasons ?? []).map(async (seasonId) => await database.seasonFind({ seasonId: seasonId })))
+        ).map(async (season) => ({
+          ...season,
+          episodes: await Promise.all(
+            (
+              await Promise.all(
+                (season.episodes ?? []).map(async (episodeId) => await database.episodeFind({ episodeId: episodeId, seasonId: season.id }))
+              )
+            ).map(async (episode) => ({
+              ...episode,
+              sources: (
+                await Promise.all((episode.sources ?? []).map(async (sourceId) => await database.sourceFind({ sourceId: sourceId })))
+              ).map((source) => ({
+                ...source,
+                name: source.name ?? episode.name,
+                url: source.url ?? undefined,
+                key: source.key ?? undefined,
+                language: source.language ?? undefined,
+                subtitles: source.subtitles ?? undefined
+              }))
+            }))
+          )
+        }))
+      ),
       owner: collection.owner,
       creationDate: collection.creationDate
     };
@@ -506,9 +529,32 @@ router.put("/collection", async (req, res) => {
       id: collection.id,
       name: collection.name,
       visibility: collection.visibility,
-      seasons: [],
-      thumbnail:
-        (thumbnail ? await signDownloadUrl({ uid: thumbnail.owner, fileId: thumbnail.id, filename: thumbnail.name }, 43200) : undefined) ?? undefined,
+      seasons: await Promise.all(
+        (
+          await Promise.all((collection.seasons ?? []).map(async (seasonId) => await database.seasonFind({ seasonId: seasonId })))
+        ).map(async (season) => ({
+          ...season,
+          episodes: await Promise.all(
+            (
+              await Promise.all(
+                (season.episodes ?? []).map(async (episodeId) => await database.episodeFind({ episodeId: episodeId, seasonId: season.id }))
+              )
+            ).map(async (episode) => ({
+              ...episode,
+              sources: (
+                await Promise.all((episode.sources ?? []).map(async (sourceId) => await database.sourceFind({ sourceId: sourceId })))
+              ).map((source) => ({
+                ...source,
+                name: source.name ?? episode.name,
+                url: source.url ?? undefined,
+                key: source.key ?? undefined,
+                language: source.language ?? undefined,
+                subtitles: source.subtitles ?? undefined
+              }))
+            }))
+          )
+        }))
+      ),
       owner: collection.owner,
       creationDate: collection.creationDate
     };
@@ -599,7 +645,25 @@ router.post("/season", async (req, res) => {
       collectionId: season.collectionId,
       id: season.id,
       index: season.index,
-      episodes: season.episodes ?? [],
+      episodes: await Promise.all(
+        (
+          await Promise.all(
+            (season.episodes ?? []).map(async (episodeId) => await database.episodeFind({ episodeId: episodeId, seasonId: season.id }))
+          )
+        ).map(async (episode) => ({
+          ...episode,
+          sources: (
+            await Promise.all((episode.sources ?? []).map(async (sourceId) => await database.sourceFind({ sourceId: sourceId })))
+          ).map((source) => ({
+            ...source,
+            name: source.name ?? episode.name,
+            url: source.url ?? undefined,
+            key: source.key ?? undefined,
+            language: source.language ?? undefined,
+            subtitles: source.subtitles ?? undefined
+          }))
+        }))
+      ),
       languages: season.languages ?? [],
       subtitles: season.subtitles ?? []
     };
