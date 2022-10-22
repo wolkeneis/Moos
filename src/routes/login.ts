@@ -50,7 +50,9 @@ router.get(
     try {
       const token = await createToken((req.user as { uid: string }).uid);
       return res.redirect(
-        `${envRequire("CONTROL_ORIGIN")}/redirect/session?token=${encodeURIComponent(token)}&_csrf=${encodeURIComponent(req.csrfToken())}`
+        `${envRequire("CONTROL_ORIGIN")}/redirect/session?token=${encodeURIComponent(token)}&_csrf=${encodeURIComponent(
+          doubleCsrfUtilities.generateToken(res, req)
+        )}`
       );
     } catch (error) {
       console.error(error);

@@ -30,7 +30,7 @@ export const passportMiddleware: RequestHandler = passport.initialize();
 
 export const doubleCsrfUtilities = doubleCsrf({
   getSecret: () => envRequire("SESSION_SECRET"),
-  cookieName: "x-csrf-token",
+  cookieName: "csrf-token",
   cookieOptions: {
     path: "/",
     httpOnly: true,
