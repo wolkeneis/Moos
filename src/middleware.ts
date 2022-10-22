@@ -1,5 +1,5 @@
-import csurf from "csurf";
-import type { RequestHandler } from "express";
+import { doubleCsrf } from "csrf-csrf";
+import express, { RequestHandler } from "express";
 import session from "express-session";
 import passport from "passport";
 import { verifyCookie } from "./auth.js";
@@ -9,7 +9,7 @@ import { env, envRequire } from "./environment.js";
 import { firestore } from "./firebase.js";
 import FirestoreStore from "./firestore-sesison.js";
 
-export const sessionMiddleware: RequestHandler = session({
+export const sessionMiddleware: express.RequestHandler = session({
   store: new FirestoreStore({
     database: firestore,
     collection: "Sessions"
@@ -28,14 +28,19 @@ export const sessionMiddleware: RequestHandler = session({
 
 export const passportMiddleware: RequestHandler = passport.initialize();
 
-export const csrfMiddleware: RequestHandler = csurf({
-  cookie: {
+export const doubleCsrfUtilities = doubleCsrf({
+  getSecret: () => envRequire("SESSION_SECRET"),
+  cookieName: "x-csrf-token",
+  cookieOptions: {
     path: "/",
-    sameSite: "none",
     httpOnly: true,
+    sameSite: "none",
     secure: env("NODE_ENV") !== "development",
     maxAge: 604800000
-  }
+  },
+  size: 64,
+  ignoredMethods: ["GET", "HEAD", "OPTIONS"],
+  getTokenFromRequest: (req) => req.headers["x-csrf-token"]
 });
 
 export const ensureLoggedIn = (redirect?: string): RequestHandler => {

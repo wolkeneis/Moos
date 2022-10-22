@@ -3,11 +3,11 @@ import type { v1 } from "moos-api";
 import { createCookie, verifyCookie } from "../../auth.js";
 import { env } from "../../environment.js";
 import { auth } from "../../firebase.js";
-import { csrfMiddleware } from "../../middleware.js";
+import { doubleCsrfUtilities } from "../../middleware.js";
 
 const router: Router = express.Router();
 
-router.use(csrfMiddleware);
+router.use(doubleCsrfUtilities.doubleCsrfProtection);
 
 router.post("/", async (req, res) => {
   const body: v1.operations["request-session"]["requestBody"]["content"]["application/json"] = req.body;

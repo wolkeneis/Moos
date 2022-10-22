@@ -4,11 +4,11 @@ import { v4 as uuidv4 } from "uuid";
 import { AuthProvider, File, Language, Visibility, type Profile } from "../../database/database-adapter.js";
 import database from "../../database/index.js";
 import { deleteFile, FileEntry, listFiles, signDownloadUrl, signUploadUrl } from "../../files.js";
-import { csrfMiddleware, ensureLoggedIn } from "../../middleware.js";
+import { doubleCsrfUtilities, ensureLoggedIn } from "../../middleware.js";
 
 const router: Router = express.Router();
 
-router.use(csrfMiddleware);
+router.use(doubleCsrfUtilities.doubleCsrfProtection);
 router.use(ensureLoggedIn());
 
 router.post("/", async (req, res) => {

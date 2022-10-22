@@ -4,7 +4,6 @@ import { Reference } from "firebase-admin/database";
 import { Database } from "firebase-admin/lib/database/database";
 import DatabaseAdapter, {
   type AddFriendOptions,
-  type DeleteFriendOptions,
   type Application,
   type ApplicationToken,
   type AuthorizationCode,
@@ -20,6 +19,7 @@ import DatabaseAdapter, {
   type DeleteCollectionOptions,
   type DeleteEpisodeOptions,
   type DeleteFileOptions,
+  type DeleteFriendOptions,
   type DeleteSeasonOptions,
   type DeleteSourceOptions,
   type Episode,
@@ -43,6 +43,7 @@ import DatabaseAdapter, {
   type PatchSeasonOptiopns,
   type PatchSourceOptiopns,
   type PatchUserOptiopns,
+  type Profile,
   type ProviderProfile,
   type ProviderReferences,
   type RegenerateApplicationSecretOptions,
@@ -57,8 +58,7 @@ import DatabaseAdapter, {
   type TokenReference,
   type UpdateApplicationNameOptions,
   type UpdateApplicationRedirectUriOptions,
-  type UpdateOrCreateProviderProfileOptions,
-  type Profile
+  type UpdateOrCreateProviderProfileOptions
 } from "./database-adapter.js";
 
 function _randomToken(length: number): string {

@@ -1,10 +1,10 @@
 import type { OAuth2Info, OAuth2Transaction } from "@wolkeneis/oauth2-server";
 import express, { Router } from "express";
 import passport from "passport";
-import database from "../database/index.js";
 import type { Application, Profile } from "../database/database-adapter.js";
+import database from "../database/index.js";
 import { envRequire } from "../environment.js";
-import { csrfMiddleware, ensureLoggedIn, sessionMiddleware } from "../middleware.js";
+import { doubleCsrfUtilities, ensureLoggedIn, sessionMiddleware } from "../middleware.js";
 import server, { parseAuthScope } from "../oauth2.js";
 
 const router: Router = express.Router();
@@ -14,7 +14,7 @@ router.use(sessionMiddleware);
 router.get(
   "/authorize",
   ensureLoggedIn("/login"),
-  csrfMiddleware,
+  doubleCsrfUtilities.doubleCsrfProtection,
   server.authorization(
     async (request): Promise<Application> => {
       const application = await database.applicationFindById({ applicationId: request.clientId });
@@ -41,7 +41,7 @@ router.get(
   }
 );
 
-router.post("/authorize", ensureLoggedIn("/login"), csrfMiddleware, server.transaction(), server.decision());
+router.post("/authorize", ensureLoggedIn("/login"), doubleCsrfUtilities.doubleCsrfProtection, server.transaction(), server.decision());
 
 router.post("/token", passport.authenticate(["basic", "oauth2-client-password"], { session: false }), server.token());
 

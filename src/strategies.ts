@@ -8,8 +8,8 @@ import { Strategy as BearerStrategy } from "passport-http-bearer";
 import { Strategy as ClientPasswordStrategy } from "passport-oauth2-client-password";
 import { v4 as uuidv4 } from "uuid";
 import { createUser, verifyCookie } from "./auth.js";
+import { AuthProvider, type Application, type Profile } from "./database/database-adapter.js";
 import database from "./database/index.js";
-import { type Application, AuthProvider, type Profile } from "./database/database-adapter.js";
 import { envRequire } from "./environment.js";
 
 passport.serializeUser((user, done) => {

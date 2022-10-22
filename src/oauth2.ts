@@ -1,7 +1,7 @@
 import { CodeExchange, CodeGrant, OAuth2Server, OAuth2Tokens, OAuth2Transaction } from "@wolkeneis/oauth2-server";
 import crypto from "crypto";
+import { AuthScope, type Application, type Profile } from "./database/database-adapter.js";
 import database from "./database/index.js";
-import { type Application, AuthScope, type Profile } from "./database/database-adapter.js";
 
 const server: OAuth2Server = new OAuth2Server(
   async (application: unknown) => (application as Application).id,

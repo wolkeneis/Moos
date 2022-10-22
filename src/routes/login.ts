@@ -2,12 +2,12 @@ import express, { Router } from "express";
 import passport from "passport";
 import { createToken } from "../auth.js";
 import { env, envRequire } from "../environment.js";
-import { csrfMiddleware } from "../middleware.js";
+import { doubleCsrfUtilities } from "../middleware.js";
 import "../strategies.js";
 
 const router: Router = express.Router();
 
-router.use(csrfMiddleware);
+router.use(doubleCsrfUtilities.doubleCsrfProtection);
 
 router.get("/", (req, res) => {
   res.redirect(env("CONTROL_ORIGIN") + "/redirect/login");
