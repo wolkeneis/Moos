@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import type { v1 } from "moos-api";
+import type { moos_api_v1 as v1 } from "moos-api";
 import { createCookie, verifyCookie } from "../../auth.js";
 import { env } from "../../environment.js";
 import { auth } from "../../firebase.js";
@@ -10,7 +10,7 @@ const router: Router = express.Router();
 router.use(doubleCsrfUtilities.doubleCsrfProtection);
 
 router.post("/", async (req, res) => {
-  const body: v1.operations["request-session"]["requestBody"]["content"]["application/json"] = req.body;
+  const body: v1.paths["/session"]["post"]["requestBody"]["content"]["application/json"] = req.body;
   const token = body.token;
   if (!token) {
     return res.sendStatus(400);

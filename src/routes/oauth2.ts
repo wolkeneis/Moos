@@ -36,7 +36,9 @@ router.get(
       envRequire("CONTROL_ORIGIN") +
         `/redirect/authorize?transactionId=${encodeURIComponent(req.oauth2.transactionId)}&redirectUri=${encodeURIComponent(
           req.oauth2.redirectUri
-        )}&application=${encodeURIComponent(req.oauth2.client.name)}&scope=${req.oauth2.info!.scope}&_csrf=${encodeURIComponent(req.csrfToken())}`
+        )}&application=${encodeURIComponent(req.oauth2.client.name)}&scope=${req.oauth2.info!.scope}&_csrf=${encodeURIComponent(
+          doubleCsrfUtilities.generateToken(res, req)
+        )}`
     );
   }
 );

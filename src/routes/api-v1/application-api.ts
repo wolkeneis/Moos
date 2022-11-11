@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import type { v1 } from "moos-api";
+import type { moos_api_v1 as v1 } from "moos-api";
 import passport from "passport";
 import type { Profile } from "../../database/database-adapter.js";
 
