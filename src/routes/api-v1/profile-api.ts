@@ -1,14 +1,14 @@
 import express, { Router } from "express";
 import type { moos_api_v1 as v1 } from "moos-api";
 import { v4 as uuidv4 } from "uuid";
-import { AuthProvider, File, Language, Visibility, type Profile } from "../../database/database-adapter.js";
+import { AuthProvider, File, type Profile } from "../../database/database-adapter.js";
 import database from "../../database/index.js";
 import { deleteFile, FileEntry, listFiles, signDownloadUrl, signUploadUrl } from "../../files.js";
-import { doubleCsrfUtilities, ensureLoggedIn } from "../../middleware.js";
+import { csurfMiddleware, ensureLoggedIn } from "../../middleware.js";
 
 const router: Router = express.Router();
 
-router.use(doubleCsrfUtilities.doubleCsrfProtection);
+router.use(csurfMiddleware);
 router.use(ensureLoggedIn());
 
 router.post("/", async (req, res) => {
@@ -32,7 +32,7 @@ router.post("/", async (req, res) => {
       }
     }
   }
-  const response: v1.operations["fetch-profile"]["responses"]["200"]["content"]["application/json"] = {
+  const response: v1.paths["/profile"]["post"]["responses"]["200"]["content"]["application/json"] = {
     uid: profile.uid,
     username: profile.username,
     avatar: profile.avatar,
@@ -46,7 +46,7 @@ router.post("/", async (req, res) => {
 
 router.patch("/", async (req, res) => {
   const profile = req.user as Profile;
-  const body: v1.operations["patch-profile"]["requestBody"]["content"]["application/json"] = req.body;
+  const body: v1.paths["/profile"]["patch"]["requestBody"]["content"]["application/json"] = req.body;
   if (!body) {
     return res.sendStatus(400);
   }
@@ -65,7 +65,7 @@ router.patch("/", async (req, res) => {
 router.post("/friends", async (req, res) => {
   const profile = req.user as Profile;
   try {
-    const friends: v1.operations["post-profile-friends"]["responses"]["200"]["content"]["application/json"] = (
+    const friends: v1.paths["/profile/friends"]["post"]["responses"]["200"]["content"]["application/json"] = (
       await Promise.all(profile.friends?.map(async (friendId) => await database.userFindById({ uid: friendId })) ?? [])
     ).map((fetchedFriend) => {
       const friend: v1.Friend = {
@@ -144,9 +144,10 @@ router.post("/friend/:friendId/applications", async (req, res) => {
         return res.json([]);
       }
     }
-    const applications: v1.operations["post-profile-friend-applications"]["responses"]["200"]["content"]["application/json"] = await Promise.all(
-      (friendProfile.applications ?? []).map(async (applicationId) => await database.applicationFindById({ applicationId: applicationId }))
-    );
+    const applications: v1.paths["/profile/friend/{friendId}/applications"]["post"]["responses"]["200"]["content"]["application/json"] =
+      await Promise.all(
+        (friendProfile.applications ?? []).map(async (applicationId) => await database.applicationFindById({ applicationId: applicationId }))
+      );
     return res.json(applications);
   } catch (error) {
     console.error(error);
@@ -175,7 +176,7 @@ router.post("/friend/:friendId/files", async (req, res) => {
       await Promise.all(friendProfile.files?.map(async (fileId) => await database.fileFind({ fileId: fileId })) ?? [])
     ).filter((file) => !file.private);
     const definitions = await listFiles({ uid: friendId });
-    const files: v1.operations["post-profile-friend-files"]["responses"]["200"]["content"]["application/json"] = await Promise.all(
+    const files: v1.paths["/profile/friend/{friendId}/files"]["post"]["responses"]["200"]["content"]["application/json"] = await Promise.all(
       metadata.map(async (metadata) => {
         const definition: FileEntry = definitions.find((file) => file.key === `${profile.uid}/${metadata.id}`) ?? {};
         const file: v1.File = {
@@ -238,7 +239,7 @@ router.post("/files", async (req, res) => {
   try {
     const metadata = await Promise.all((profile.files ?? []).map((fileId) => database.fileFind({ fileId: fileId })));
     const definitions = await listFiles({ uid: profile.uid });
-    const files: v1.operations["post-profile-files"]["responses"]["200"]["content"]["application/json"] = await Promise.all(
+    const files: v1.paths["/profile/files"]["post"]["responses"]["200"]["content"]["application/json"] = await Promise.all(
       metadata.map(async (metadata) => {
         const definition: FileEntry = definitions.find((file) => file.key === `${profile.uid}/${metadata.id}`) ?? {};
         const file: v1.File = {
@@ -262,7 +263,7 @@ router.post("/files", async (req, res) => {
 
 router.post("/file", async (req, res) => {
   const profile = req.user as Profile;
-  const body: v1.operations["post-profile-file"]["requestBody"]["content"]["application/json"] = req.body;
+  const body: v1.paths["/profile/file"]["post"]["requestBody"]["content"]["application/json"] = req.body;
   if (!body || !body.id || (body.ttl && (typeof body.ttl !== "number" || body.ttl > 43200 || body.ttl < 60))) {
     return res.sendStatus(400);
   }
@@ -275,7 +276,7 @@ router.post("/file", async (req, res) => {
       return res.sendStatus(403);
     }
     const url = await signDownloadUrl({ uid: fileMetadata.owner, fileId: fileMetadata.id, filename: fileMetadata.name }, body.ttl ?? 14400);
-    const file: v1.operations["post-profile-file"]["responses"]["200"]["content"]["application/json"] = {
+    const file: v1.paths["/profile/file"]["post"]["responses"]["200"]["content"]["application/json"] = {
       id: fileMetadata.id,
       url: url,
       ttl: body.ttl ?? 14400
@@ -289,7 +290,7 @@ router.post("/file", async (req, res) => {
 
 router.put("/file", async (req, res) => {
   const profile = req.user as Profile;
-  const body: v1.operations["put-profile-file"]["requestBody"]["content"]["application/json"] = req.body;
+  const body: v1.paths["/profile/file"]["put"]["requestBody"]["content"]["application/json"] = req.body;
   if (!body || !body.name) {
     return res.sendStatus(400);
   }
@@ -297,7 +298,7 @@ router.put("/file", async (req, res) => {
     const fileId = uuidv4();
     await database.fileCreate({ id: fileId, name: body.name, owner: profile.uid, private: body.private ?? true });
     const url = await signUploadUrl({ uid: profile.uid, fileId: fileId });
-    const file: v1.operations["put-profile-file"]["responses"]["200"]["content"]["application/json"] = {
+    const file: v1.paths["/profile/file"]["put"]["responses"]["200"]["content"]["application/json"] = {
       id: fileId,
       url: url,
       ttl: 14400
@@ -311,7 +312,7 @@ router.put("/file", async (req, res) => {
 
 router.patch("/file", async (req, res) => {
   const profile = req.user as Profile;
-  const body: v1.operations["patch-profile-file"]["requestBody"]["content"]["application/json"] = req.body;
+  const body: v1.paths["/profile/file"]["patch"]["requestBody"]["content"]["application/json"] = req.body;
   if (!body || !body.id) {
     return res.sendStatus(400);
   }
@@ -337,7 +338,7 @@ router.patch("/file", async (req, res) => {
 
 router.delete("/file", async (req, res) => {
   const profile = req.user as Profile;
-  const body: v1.operations["delete-profile-file"]["requestBody"]["content"]["application/json"] = req.body;
+  const body: v1.paths["/profile/file"]["delete"]["requestBody"]["content"]["application/json"] = req.body;
   if (!body || !body.id) {
     return res.sendStatus(400);
   }

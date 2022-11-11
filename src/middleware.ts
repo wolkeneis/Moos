@@ -1,4 +1,4 @@
-import { doubleCsrf } from "csrf-csrf";
+import csurf from "@wolkeneis/csurf";
 import express, { RequestHandler } from "express";
 import session from "express-session";
 import passport from "passport";
@@ -28,19 +28,15 @@ export const sessionMiddleware: express.RequestHandler = session({
 
 export const passportMiddleware: RequestHandler = passport.initialize();
 
-export const doubleCsrfUtilities = doubleCsrf({
-  getSecret: () => envRequire("SESSION_SECRET"),
-  cookieName: "csrf-token",
-  cookieOptions: {
+export const csurfMiddleware: RequestHandler = csurf({
+  cookie: {
     path: "/",
     httpOnly: true,
     sameSite: "none",
+    key: "__csrf",
     secure: env("NODE_ENV") !== "development",
     maxAge: 604800000
-  },
-  size: 64,
-  ignoredMethods: ["GET", "HEAD", "OPTIONS"],
-  getTokenFromRequest: (req) => req.headers["x-csrf-token"]
+  }
 });
 
 export const ensureLoggedIn = (redirect?: string): RequestHandler => {

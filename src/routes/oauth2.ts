@@ -4,7 +4,7 @@ import passport from "passport";
 import type { Application, Profile } from "../database/database-adapter.js";
 import database from "../database/index.js";
 import { envRequire } from "../environment.js";
-import { doubleCsrfUtilities, ensureLoggedIn, sessionMiddleware } from "../middleware.js";
+import { csurfMiddleware, ensureLoggedIn, sessionMiddleware } from "../middleware.js";
 import server, { parseAuthScope } from "../oauth2.js";
 
 const router: Router = express.Router();
@@ -14,7 +14,7 @@ router.use(sessionMiddleware);
 router.get(
   "/authorize",
   ensureLoggedIn("/login"),
-  doubleCsrfUtilities.doubleCsrfProtection,
+  csurfMiddleware,
   server.authorization(
     async (request): Promise<Application> => {
       const application = await database.applicationFindById({ applicationId: request.clientId });
@@ -36,14 +36,12 @@ router.get(
       envRequire("CONTROL_ORIGIN") +
         `/redirect/authorize?transactionId=${encodeURIComponent(req.oauth2.transactionId)}&redirectUri=${encodeURIComponent(
           req.oauth2.redirectUri
-        )}&application=${encodeURIComponent(req.oauth2.client.name)}&scope=${req.oauth2.info!.scope}&_csrf=${encodeURIComponent(
-          doubleCsrfUtilities.generateToken(res, req)
-        )}`
+        )}&application=${encodeURIComponent(req.oauth2.client.name)}&scope=${req.oauth2.info!.scope}&_csrf=${encodeURIComponent(req.csrfToken())}`
     );
   }
 );
 
-router.post("/authorize", ensureLoggedIn("/login"), doubleCsrfUtilities.doubleCsrfProtection, server.transaction(), server.decision());
+router.post("/authorize", ensureLoggedIn("/login"), csurfMiddleware, server.transaction(), server.decision());
 
 router.post("/token", passport.authenticate(["basic", "oauth2-client-password"], { session: false }), server.token());
 

@@ -2,12 +2,12 @@ import express, { Router } from "express";
 import passport from "passport";
 import { createToken } from "../auth.js";
 import { env, envRequire } from "../environment.js";
-import { doubleCsrfUtilities } from "../middleware.js";
+import { csurfMiddleware } from "../middleware.js";
 import "../strategies.js";
 
 const router: Router = express.Router();
 
-router.use(doubleCsrfUtilities.doubleCsrfProtection);
+router.use(csurfMiddleware);
 
 router.get("/", (req, res) => {
   res.redirect(env("CONTROL_ORIGIN") + "/redirect/login");
@@ -27,9 +27,7 @@ router.get(
     try {
       const token = await createToken((req.user as { uid: string }).uid);
       return res.redirect(
-        `${envRequire("CONTROL_ORIGIN")}/redirect/session?token=${encodeURIComponent(token)}&_csrf=${encodeURIComponent(
-          doubleCsrfUtilities.generateToken(res, req)
-        )}`
+        `${envRequire("CONTROL_ORIGIN")}/redirect/session?token=${encodeURIComponent(token)}&_csrf=${encodeURIComponent(req.csrfToken())}`
       );
     } catch (error) {
       console.error(error);
@@ -52,9 +50,7 @@ router.get(
     try {
       const token = await createToken((req.user as { uid: string }).uid);
       return res.redirect(
-        `${envRequire("CONTROL_ORIGIN")}/redirect/session?token=${encodeURIComponent(token)}&_csrf=${encodeURIComponent(
-          doubleCsrfUtilities.generateToken(res, req)
-        )}`
+        `${envRequire("CONTROL_ORIGIN")}/redirect/session?token=${encodeURIComponent(token)}&_csrf=${encodeURIComponent(req.csrfToken())}`
       );
     } catch (error) {
       console.error(error);

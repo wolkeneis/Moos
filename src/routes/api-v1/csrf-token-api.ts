@@ -1,13 +1,13 @@
 import express, { Router } from "express";
-import { doubleCsrfUtilities } from "../../middleware.js";
+import { csurfMiddleware } from "../../middleware.js";
 
 const router: Router = express.Router();
 
-router.use(doubleCsrfUtilities.doubleCsrfProtection);
+router.use(csurfMiddleware);
 
 router.get("/", async (req, res) => {
   return res.json({
-    _csrf: doubleCsrfUtilities.generateToken(res, req)
+    _csrf: req.csrfToken()
   });
 });
 

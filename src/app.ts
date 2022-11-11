@@ -25,7 +25,7 @@ app.use(
         callback(new Error("Not allowed by CORS: " + origin));
       }
     },
-    allowedHeaders: "X-Requested-With, Content-Type, x-csrf-token",
+    allowedHeaders: "X-Requested-With, Content-Type, csrf-token",
     credentials: true
   })
 );
