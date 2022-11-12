@@ -28,8 +28,10 @@ passport.deserializeUser(async (uid: string, done) => {
 async function verifyApplication(applicationId: string, applicationSecret: string, done: (error: Error | null, application?: Application) => void) {
   try {
     const application = await database.applicationFindById({ applicationId: applicationId });
+    console.log(application);
     if (!application) return done(null);
     const successful = await database.applicationCheckSecret({ applicationId: applicationId, secret: applicationSecret });
+    console.log(successful);
     if (!successful) return done(null);
     return done(null, application);
   } catch (error) {
